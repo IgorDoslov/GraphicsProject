@@ -56,7 +56,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 	//Gizmos::addSphere(vec3(0, 0, 0), 1, 16, 16, vec4(1, 1, 0, 1));
 	Gizmos::addSphere(-vec3(glm::cos(time * 5), 0, glm::sin(time * 5)), 0.1, 8, 8, vec4(1, 0, 0, 1));
 	Gizmos::addSphere(-vec3(glm::cos(time * 2), 0, glm::sin(time * 2)) + vec3(6), 0.1, 8, 8, vec4(1, 0, 0, 1));
-	Gizmos::addSphere(-vec3(0, 0, 0), 0.1, 8, 8, vec4(1, 0, 0, 1));
+	Gizmos::addSphere(-vec3(0, 0, 0), 1, 16, 16, vec4(1, 1, 0, 1));
 
 
 
