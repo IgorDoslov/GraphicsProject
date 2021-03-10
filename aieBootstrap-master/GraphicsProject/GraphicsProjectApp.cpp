@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 
+
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
@@ -26,9 +27,9 @@ bool GraphicsProjectApp::startup() {
 
 	// create simple camera transforms
 	m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, 16.0f / 9.0f, 0.1f, 1000.0f);
+	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
-	return true;
+	return LoadShaderAndMeshLogic();
 }
 
 void GraphicsProjectApp::shutdown() {
@@ -79,5 +80,45 @@ void GraphicsProjectApp::draw() {
 	// update perspective based on screen size
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
+	DrawShaderAndMeshes(m_projectionMatrix, m_viewMatrix);
+
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
+}
+
+bool GraphicsProjectApp::LoadShaderAndMeshLogic()
+{
+	// Load the vertex shader from a file
+	m_simpleShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
+
+	// Load the fragment shader from a file
+	m_simpleShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
+	if (!m_simpleShader.link())
+	{
+		printf("Simple Shader had an error: %s\n", m_simpleShader.getLastError());
+		return false;
+	}
+
+	m_quadMesh.InitialiseQuad();
+
+	// We will make the quad 10 units by 10 units
+	m_quadTransform = {
+	10, 0, 0, 0,
+	0, 10, 0, 0,
+	0, 0, 10, 0,
+	0, 0, 0, 1 
+	};
+
+	return true;
+}
+
+void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projection, glm::mat4 a_viewMatrix)
+{
+	// Bind the shader
+	m_simpleShader.bind();
+
+	// Bind the transform of the mesh
+	auto pvm = a_projection * a_viewMatrix * m_quadTransform; // PVM = Projection View Matrix
+	m_simpleShader.bindUniform("ProjectionViewModel", pvm);
+
+	m_quadMesh.Draw();
 }
