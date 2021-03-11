@@ -53,4 +53,5 @@ protected:
 public:
 	bool LoadShaderAndMeshLogic();
 	void DrawShaderAndMeshes(glm::mat4, glm::mat4);
+	void IMGUI_Logic();
 };

@@ -3,6 +3,7 @@
 #include "Input.h"
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
+#include <imgui.h>
 
 
 using glm::vec3;
@@ -10,7 +11,10 @@ using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
 
-GraphicsProjectApp::GraphicsProjectApp() {
+GraphicsProjectApp::GraphicsProjectApp() : m_ambientLight(), m_bunnyTransform(), m_light(), m_projectionMatrix(), m_quadTransform(), m_viewMatrix()
+{
+	
+
 
 }
 
@@ -74,6 +78,8 @@ void GraphicsProjectApp::update(float deltaTime) {
 
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
+
+	IMGUI_Logic();
 
 	m_light.direction = glm::normalize(glm::vec3(glm::cos(time * 2),
 		(glm::sin(time * 2)),
@@ -244,5 +250,14 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 
 #pragma endregion
 
+
+}
+
+void GraphicsProjectApp::IMGUI_Logic()
+{
+	ImGui::Begin("Scene Light Settings");
+	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.f, 1.f);
+	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.f, 2.0f);
+	ImGui::End();
 
 }
