@@ -168,7 +168,8 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 	unsigned int indices[6] = { 0,1,2,2,1,3 };
 
-	m_quadMesh.Initialise(4, vertices, 6, indices);
+	//m_quadMesh.Initialise(4, vertices, 6, indices);
+	m_quadMesh.InitialiseQuad();
 	// We will make the quad 10 units by 10 units
 	m_quadTransform = {
 	10, 0, 0, 0,
@@ -287,6 +288,26 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 #pragma endregion
 
+#pragma region Texture Shader
+	m_textureShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/textured.vert");
+	m_textureShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/textured.frag");
+
+	if (m_textureShader.link() == false)
+	{
+		printf("Textured Shader had an error: %s\n", m_textureShader.getLastError());
+		return false;
+	}
+
+#pragma endregion
+
+#pragma region Grid Logic
+	if (m_gridTexture.load("./textures/numbered_grid.tga") == false)
+	{
+		printf("Failed to load: numbered_grid.tga\n");
+		return false;
+	}
+#pragma endregion
+
 
 	return true;
 }
@@ -298,12 +319,19 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 #pragma region Quad
 
 	// Bind the shader
-	m_simpleShader.bind();
+	m_textureShader.bind();
 
 	// Bind the transform of the mesh
 	pvm = a_projectionMatrix * a_viewMatrix * m_quadTransform; // PVM = Projection View Matrix
-	m_simpleShader.bindUniform("ProjectionViewModel", pvm);
+	m_textureShader.bindUniform("ProjectionViewModel", pvm);
 
+	// Bind the texture to a location of your choice (0)
+	m_textureShader.bindUniform("diffuseTexture", 0);
+
+	// Bind the texture to the specified location
+	m_gridTexture.bind(0);
+
+	// Draw the quad...
 	m_quadMesh.Draw();
 #pragma endregion
 

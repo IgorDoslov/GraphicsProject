@@ -31,10 +31,13 @@ protected:
 	glm::mat4	m_viewMatrix;
 	glm::mat4	m_projectionMatrix;
 
+	aie::Texture m_gridTexture;
+
 	// === SHADER ===
 	aie::ShaderProgram m_simpleShader;
 	aie::ShaderProgram m_bunnyShader;
 	aie::ShaderProgram m_phongShader;
+	aie::ShaderProgram m_textureShader;
 	// ==============
 	// Basic plane
 	Mesh m_quadMesh;
