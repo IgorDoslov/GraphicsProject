@@ -19,7 +19,7 @@ private:
 	float m_theta; // In degrees
 	float m_phi; // In degress
 	glm::vec3 m_position;
-
+	float m_speed = 10.f;
 	float m_lastMouseX, m_lastMouseY;
 };
 

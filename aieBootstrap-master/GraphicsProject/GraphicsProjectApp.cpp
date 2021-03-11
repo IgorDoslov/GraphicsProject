@@ -38,6 +38,13 @@ bool GraphicsProjectApp::startup() {
 	m_light.colour = { 1, 1, 1 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
+	Camera cam1;
+	Camera cam2;
+
+	m_cameras.push_back(cam1);
+	m_cameras.push_back(cam2);
+
+
 	return LoadShaderAndMeshLogic();
 }
 
@@ -80,7 +87,8 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
 
-	m_camera.Update(deltaTime);
+	//m_camera.Update(deltaTime);
+	m_cameras[m_currentCamera].Update(deltaTime);
 
 	IMGUI_Logic();
 
@@ -91,6 +99,21 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
+	if (input->wasKeyPressed(aie::INPUT_KEY_UP))
+	{
+		if (m_currentCamera < m_maxCameras)
+		{
+			m_currentCamera++;
+		}
+	}
+	if (input->wasKeyPressed(aie::INPUT_KEY_DOWN))
+	{
+		if (m_currentCamera > 0)
+		{
+			m_currentCamera--;
+		}
+	}
+
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 }
@@ -100,8 +123,8 @@ void GraphicsProjectApp::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
-	glm::mat4 projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
-	glm::mat4 viewMatrix = m_camera.GetViewMatrix();
+	glm::mat4 projectionMatrix = m_cameras[m_currentCamera].GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
+	glm::mat4 viewMatrix = m_cameras[m_currentCamera].GetViewMatrix();
 
 	// update perspective based on screen size
 	//m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);

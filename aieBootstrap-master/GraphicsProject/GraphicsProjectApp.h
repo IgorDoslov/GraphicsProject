@@ -6,6 +6,7 @@
 #include <glm/mat4x4.hpp>
 #include "OBJMesh.h"
 #include "Camera.h"
+#include <Vector>
 
 class GraphicsProjectApp : public aie::Application {
 public:
@@ -21,8 +22,10 @@ public:
 
 protected:
 
-	
-	Camera m_camera;
+	int m_currentCamera = 0;
+	int const m_maxCameras = 1;
+	//Camera m_camera;
+	std::vector<Camera> m_cameras;
 
 	// camera transforms
 	glm::mat4	m_viewMatrix;
