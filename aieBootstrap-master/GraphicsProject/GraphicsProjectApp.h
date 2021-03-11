@@ -37,6 +37,20 @@ protected:
 	// Create a bunny with a flat colour
 	aie::OBJMesh m_bunnyMesh;
 	glm::mat4 m_bunnyTransform;
+	glm::vec3 m_bunnyPosition = {0,0,0};
+
+	// Create a dragon with a flat colour
+	aie::OBJMesh m_dragonMesh;
+	glm::mat4 m_dragonTransform;
+
+
+	// Create a Buddha with a flat colour
+	aie::OBJMesh m_buddhaMesh;
+	glm::mat4 m_buddhaTransform;
+
+	// Create a Lucy with a flat colour
+	aie::OBJMesh m_lucyMesh;
+	glm::mat4 m_lucyTransform;
 
 	struct Light {
 		glm::vec3 direction;
@@ -48,7 +62,7 @@ protected:
 
 
 
-	glm::vec3 m_camPosition = glm::vec3(10);
+	glm::vec3 m_camPosition = glm::vec3(15);
 
 public:
 	bool LoadShaderAndMeshLogic();

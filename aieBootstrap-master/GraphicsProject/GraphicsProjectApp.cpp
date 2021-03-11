@@ -13,7 +13,7 @@ using aie::Gizmos;
 
 GraphicsProjectApp::GraphicsProjectApp() : m_ambientLight(), m_bunnyTransform(), m_light(), m_projectionMatrix(), m_quadTransform(), m_viewMatrix()
 {
-	
+
 
 
 }
@@ -30,8 +30,8 @@ bool GraphicsProjectApp::startup() {
 	Gizmos::create(10000, 10000, 10000, 10000);
 
 	// create simple camera transforms
-	//m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
-	m_viewMatrix = glm::lookAt(m_camPosition, vec3(0), vec3(0, 1, 0));
+	m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
+	//m_viewMatrix = glm::lookAt(m_camPosition, vec3(0), vec3(0, 1, 0));
 
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
@@ -72,9 +72,10 @@ void GraphicsProjectApp::update(float deltaTime) {
 	angle += deltaTime;
 	m_camPosition.x = 10.f * sin(angle);
 	m_camPosition.z = 10.f * cos(angle);
-	m_viewMatrix = glm::lookAt(m_camPosition, vec3(0), vec3(0, 1, 0));
+	//m_viewMatrix = glm::lookAt(m_camPosition, vec3(0), vec3(0, 1, 0));
 
-
+	m_bunnyTransform = glm::translate(m_bunnyTransform, m_bunnyPosition);
+	
 
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
@@ -153,7 +154,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 	m_quadTransform = glm::rotate(m_quadTransform, angle, glm::vec3(m_camPosition.z, 0, m_camPosition.x));
 #pragma endregion
 
-#pragma region FlatBunny
+#pragma region FlatBunny Shader
 	// Load the vertex shader from a file
 	m_bunnyShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
 
@@ -165,6 +166,11 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 		return false;
 	}
 
+
+#pragma endregion
+
+#pragma region FlatBunny Logic
+	// Logic
 	if (m_bunnyMesh.load("./stanford/bunny.obj") == false)
 	{
 		printf("Bunny mesh Failed!\n");
@@ -178,9 +184,70 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 	0,0.5f,0,0,
 	0,0,0.5f,0,
 	0,0,0,1 };
+
+	//m_bunnyTransform = glm::translate(m_bunnyTransform, glm::vec3(20,0,30));
 #pragma endregion
 
-#pragma region Phong
+#pragma region Dragon Logic
+	// Logic
+	if (m_dragonMesh.load("./stanford/dragon.obj") == false)
+	{
+		printf("Dragon mesh Failed!\n");
+		return false;
+	}
+
+
+
+	m_dragonTransform = {
+	0.5f, 0,0,0,
+	0,0.5f,0,0,
+	0,0,0.5f,0,
+	0,0,0,1 };
+
+	m_dragonTransform = glm::translate(m_dragonTransform, glm::vec3(1, 0, 1) * 10.f);
+#pragma endregion
+
+#pragma region Buddha Logic
+	// Logic
+	if (m_buddhaMesh.load("./stanford/buddha.obj") == false)
+	{
+		printf("Buddha mesh Failed!\n");
+		return false;
+	}
+
+
+
+	m_buddhaTransform = {
+	0.5f, 0,0,0,
+	0,0.5f,0,0,
+	0,0,0.5f,0,
+	0,0,0,1 };
+
+	m_buddhaTransform = glm::translate(m_buddhaTransform, glm::vec3(0, 0, 1) * 5.f);
+#pragma endregion
+
+#pragma region Lucy Logic
+	// Logic
+	if (m_lucyMesh.load("./stanford/lucy.obj") == false)
+	{
+		printf("Lucy mesh Failed!\n");
+		return false;
+	}
+
+
+
+	m_lucyTransform = {
+	0.5f, 0,0,0,
+	0,0.5f,0,0,
+	0,0,0.5f,0,
+	0,0,0,1 };
+
+	
+#pragma endregion
+
+
+
+#pragma region Phong Load
 	m_phongShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/phong.vert");
 	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/phong.frag");
 
@@ -224,7 +291,7 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 
 #pragma endregion
 
-#pragma region Phong
+#pragma region Phong Shader
 
 	// Bind the shader
 	m_phongShader.bind();
@@ -239,6 +306,8 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 	// Bind the light
 	m_phongShader.bindUniform("LightDirection", m_light.direction);
 
+#pragma region Bunny
+
 	// Bind the PVM
 	pvm = a_projectionMatrix * a_viewMatrix * m_bunnyTransform;
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);
@@ -247,6 +316,42 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 	m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
 
 	m_bunnyMesh.draw();
+#pragma endregion
+
+#pragma region Dragon
+
+	// Bind the PVM
+	pvm = a_projectionMatrix * a_viewMatrix * m_dragonTransform;
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
+
+	// Bind the lighting transforms
+	m_phongShader.bindUniform("ModelMatrix", m_dragonTransform);
+
+	m_dragonMesh.draw();
+#pragma endregion
+
+#pragma region Buddha
+	// Bind the PVM
+	pvm = a_projectionMatrix * a_viewMatrix * m_buddhaTransform;
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
+
+	// Bind the lighting transforms
+	m_phongShader.bindUniform("ModelMatrix", m_buddhaTransform);
+
+	m_buddhaMesh.draw();
+#pragma endregion
+
+#pragma region Lucy
+	// Bind the PVM
+	pvm = a_projectionMatrix * a_viewMatrix * m_lucyTransform;
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
+
+	// Bind the lighting transforms
+	m_phongShader.bindUniform("ModelMatrix", m_lucyTransform);
+
+	m_lucyMesh.draw();
+#pragma endregion
+
 
 #pragma endregion
 
@@ -258,6 +363,17 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::Begin("Scene Light Settings");
 	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.f, 1.f);
 	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.f, 2.0f);
+	ImGui::End();
+
+	ImGui::Begin("Object Positions");
+	ImGui::DragFloat3("Bunny pos", &m_bunnyTransform[3][0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Dragon pos", &m_dragonTransform[3][0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Buddha pos", &m_buddhaTransform[3][0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Lucy pos", &m_lucyTransform[3][0], 0.1f, -20.f, 20.0f);
+	ImGui::End();
+
+	ImGui::Begin("Translate");
+	ImGui::DragFloat3("Bunny", &m_bunnyPosition[0], 0.1f, -20.f, 20.0f);
 	ImGui::End();
 
 }
