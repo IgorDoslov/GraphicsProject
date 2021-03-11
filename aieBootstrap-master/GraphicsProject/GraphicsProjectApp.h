@@ -5,6 +5,7 @@
 #include "Shader.h"
 #include <glm/mat4x4.hpp>
 #include "OBJMesh.h"
+#include "Camera.h"
 
 class GraphicsProjectApp : public aie::Application {
 public:
@@ -19,6 +20,9 @@ public:
 	virtual void draw();
 
 protected:
+
+	
+	Camera m_camera;
 
 	// camera transforms
 	glm::mat4	m_viewMatrix;
