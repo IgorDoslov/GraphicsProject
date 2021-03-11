@@ -27,13 +27,26 @@ protected:
 	// === SHADER ===
 	aie::ShaderProgram m_simpleShader;
 	aie::ShaderProgram m_bunnyShader;
+	aie::ShaderProgram m_phongShader;
 	// ==============
 	// Basic plane
 	Mesh m_quadMesh;
 	glm::mat4 m_quadTransform;
+
+
 	// Create a bunny with a flat colour
 	aie::OBJMesh m_bunnyMesh;
 	glm::mat4 m_bunnyTransform;
+
+	struct Light {
+		glm::vec3 direction;
+		glm::vec3 colour;
+	};
+
+	Light m_light;
+	glm::vec3 m_ambientLight;
+
+
 
 	glm::vec3 m_camPosition = glm::vec3(10);
 

@@ -31,6 +31,9 @@ bool GraphicsProjectApp::startup() {
 
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
+	m_light.colour = { 1, 1, 1 };
+	m_ambientLight = { 0.25f, 0.25f, 0.25f };
+
 	return LoadShaderAndMeshLogic();
 }
 
@@ -71,6 +74,10 @@ void GraphicsProjectApp::update(float deltaTime) {
 
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
+
+	m_light.direction = glm::normalize(glm::vec3(glm::cos(time * 2),
+		(glm::sin(time * 2)),
+		0));
 
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
@@ -137,7 +144,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 	float shadowLength = glm::sqrt(m_camPosition.x * m_camPosition.x + m_camPosition.z * m_camPosition.z);
 	float angle = atan(shadowLength / m_camPosition.y);
 	//m_quadTransform = glm::rotate(m_quadTransform, atan(1.41f), glm::vec3(10,0,-10));
-	m_quadTransform = glm::rotate(m_quadTransform, angle, glm::vec3(10, 0, -10));
+	m_quadTransform = glm::rotate(m_quadTransform, angle, glm::vec3(m_camPosition.z, 0, m_camPosition.x));
 #pragma endregion
 
 #pragma region FlatBunny
@@ -167,6 +174,19 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 	0,0,0,1 };
 #pragma endregion
 
+#pragma region Phong
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/phong.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/phong.frag");
+
+	if (m_phongShader.link() == false)
+	{
+		printf("Phong Shader had an error: %s\n", m_phongShader.getLastError());
+		return false;
+	}
+
+#pragma endregion
+
+
 	return true;
 }
 
@@ -193,7 +213,36 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 	m_bunnyShader.bindUniform("MeshFlatColour", glm::vec4(0, 1, 0, 1));
 
 	// Draw bunny mesh
-	m_bunnyMesh.draw();
+	//m_bunnyMesh.draw();
+
+
 #pragma endregion
+
+#pragma region Phong
+
+	// Bind the shader
+	m_phongShader.bind();
+
+	// Bind the camera position
+	m_phongShader.bindUniform("CameraPosition", vec3(glm::inverse(a_viewMatrix)[3]));
+
+	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
+	m_phongShader.bindUniform("LightColour", m_light.colour);
+	m_phongShader.bindUniform("LightDirection", m_light.direction);
+
+	// Bind the light
+	m_phongShader.bindUniform("LightDirection", m_light.direction);
+
+	// Bind the PVM
+	pvm = a_projectionMatrix * a_viewMatrix * m_bunnyTransform;
+	m_phongShader.bindUniform("ProjectionViewModel", pvm);
+
+	// Bind the lighting transforms
+	m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
+
+	m_bunnyMesh.draw();
+
+#pragma endregion
+
 
 }
