@@ -38,11 +38,9 @@ bool GraphicsProjectApp::startup() {
 	m_light.colour = { 1, 1, 1 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
-	Camera cam1;
-	Camera cam2;
 
-	m_cameras.push_back(cam1);
-	m_cameras.push_back(cam2);
+	m_cameras.push_back(Camera());
+	m_cameras.push_back(Camera());
 
 
 	return LoadShaderAndMeshLogic();
@@ -82,7 +80,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 	//m_viewMatrix = glm::lookAt(m_camPosition, vec3(0), vec3(0, 1, 0));
 
 	m_bunnyTransform = glm::translate(m_bunnyTransform, m_bunnyPosition);
-	
+
 
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
@@ -101,7 +99,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 
 	if (input->wasKeyPressed(aie::INPUT_KEY_UP))
 	{
-		if (m_currentCamera < m_maxCameras)
+		if (m_currentCamera < m_cameras.size()-1)
 		{
 			m_currentCamera++;
 		}
@@ -271,7 +269,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 	0,0,0.5f,0,
 	0,0,0,1 };
 
-	
+
 #pragma endregion
 
 
@@ -300,12 +298,40 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 #pragma endregion
 
+#pragma region NormalMapShader
+	m_normalMapShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/normalMap.vert");
+	m_normalMapShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/normalMap.frag");
+
+	if (m_normalMapShader.link() == false)
+	{
+		printf("Normal Map Shader had an error: %s\n", m_normalMapShader.getLastError());
+		return false;
+	}
+#pragma endregion
+
+
 #pragma region Grid Logic
 	if (m_gridTexture.load("./textures/numbered_grid.tga") == false)
 	{
 		printf("Failed to load: numbered_grid.tga\n");
 		return false;
 	}
+#pragma endregion
+
+
+#pragma region Soulspear
+	if (m_spearMesh.load("./soulspear/soulspear.obj", true, true) == false)
+	{
+		printf("Soulspear Mesh has had an error!\n");
+		return false;
+	}
+
+	m_spearTransform = {
+	1.f, 0, 0, 0,
+	0, 1.f, 0, 0,
+	0, 0, 1.f, 0,
+	0, 0, 0, 1 };
+
 #pragma endregion
 
 
@@ -411,6 +437,23 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 
 #pragma endregion
 
+#pragma region Soulspear
+	m_normalMapShader.bind();
+	// Bind the transform
+	pvm = a_projectionMatrix * a_viewMatrix * m_spearTransform;
+	m_normalMapShader.bindUniform("ProjectionViewModel", pvm);
+	m_normalMapShader.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
+
+	m_normalMapShader.bindUniform("AmbientColour", m_ambientLight );
+	m_normalMapShader.bindUniform("LightColour", m_light.colour );
+	m_normalMapShader.bindUniform("LightDirection", m_light.direction );
+
+	m_normalMapShader.bindUniform("ModelMatrix", m_spearTransform);
+	// Draw the mesh
+	m_spearMesh.draw();
+
+#pragma endregion
+
 
 }
 
@@ -426,6 +469,7 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::DragFloat3("Dragon pos", &m_dragonTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Buddha pos", &m_buddhaTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Lucy pos", &m_lucyTransform[3][0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Spear pos", &m_spearTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::End();
 
 	ImGui::Begin("Translate");

@@ -23,7 +23,7 @@ public:
 protected:
 
 	int m_currentCamera = 0;
-	int const m_maxCameras = 1;
+	
 	//Camera m_camera;
 	std::vector<Camera> m_cameras;
 
@@ -38,6 +38,8 @@ protected:
 	aie::ShaderProgram m_bunnyShader;
 	aie::ShaderProgram m_phongShader;
 	aie::ShaderProgram m_textureShader;
+	aie::ShaderProgram m_normalMapShader;
+
 	// ==============
 	// Basic plane
 	Mesh m_quadMesh;
@@ -61,6 +63,10 @@ protected:
 	// Create a Lucy with a flat colour
 	aie::OBJMesh m_lucyMesh;
 	glm::mat4 m_lucyTransform;
+
+	// Create a Soulspear
+	aie::OBJMesh m_spearMesh;
+	glm::mat4 m_spearTransform;
 
 	struct Light {
 		glm::vec3 direction;
