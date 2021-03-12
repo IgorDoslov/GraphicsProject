@@ -14,7 +14,7 @@ uniform sampler2D normalTexture;
 uniform vec3 Ka; // THe ambient colour of the model's material
 uniform vec3 Kd; // THe diffuse colour of the model's material
 uniform vec3 Ks; // The specular colour of the model's material
-uniform float Ns; // The specular power of the model's material
+uniform int specularPower; // The specular power of the model's material
 
 uniform vec3 AmbientColour; // Ambient colour of the light
 uniform vec3 LightColour; // Colour of the light
@@ -46,8 +46,10 @@ float lambertTerm = max(0, min(1,dot(N, -L)));
 vec3 V = normalize(CameraPosition - vPosition.xyz);
 vec3 R = reflect(L, N);
 
+float temp = specularPower;
+
 // Determing the value of the specular term
-float specularTerm = pow(max(0, dot(R,V)), 32);
+float specularTerm = pow(max(0, dot(R,V)), 40);
 
 // Determine the value of the ambient
 vec3 ambient = AmbientColour * Ka * texDiffuse;

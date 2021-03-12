@@ -36,7 +36,7 @@ bool GraphicsProjectApp::startup() {
 	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
 	m_light.colour = { 1, 1, 1 };
-	m_ambientLight = { 0.25f, 0.25f, 0.25f };
+	m_ambientLight = { 0.5f, 0.5f, 0.5f };
 
 
 	m_cameras.push_back(Camera());

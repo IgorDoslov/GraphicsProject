@@ -3,10 +3,12 @@
 
 newmtl 1001
 illum 2
-Kd 0.702 0.2784 0.1922
-Ka 0.702 0.2784 0.1922
-Ks 0 0 0
+
+Ka 0.800000 0.800000 0.800000
+Kd 0.800000 0.800000 0.800000
+Ks 0.800000 0.800000 0.800000
 specularPower 40
+map_Ka ldsword_swordcomposite_BaseColor.tga
 map_Kd ldsword_swordcomposite_BaseColor.tga
 map_Ks swordcomposite_Roughness.tga
 bump ldsword_swordcomposite_Normal.tga
