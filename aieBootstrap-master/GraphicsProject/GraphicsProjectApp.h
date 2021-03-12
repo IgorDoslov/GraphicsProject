@@ -68,6 +68,10 @@ protected:
 	aie::OBJMesh m_spearMesh;
 	glm::mat4 m_spearTransform;
 
+	// Create a sword
+	aie::OBJMesh m_swordMesh;
+	glm::mat4 m_swordTransform;
+
 	struct Light {
 		glm::vec3 direction;
 		glm::vec3 colour;

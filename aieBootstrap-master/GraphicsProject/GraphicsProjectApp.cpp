@@ -334,6 +334,22 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 #pragma endregion
 
+#pragma region Sword
+	if (m_swordMesh.load("./sword/vikingsword.obj", true, true) == false)
+	{
+		printf("sword Mesh has had an error!\n");
+		return false;
+	}
+
+	m_swordTransform = {
+	0.01f, 0, 0, 0,
+	0, 0.01f, 0, 0,
+	0, 0, 0.01f, 0,
+	0, 0, 0, 1 };
+
+#pragma endregion
+
+
 
 	return true;
 }
@@ -443,7 +459,7 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 	pvm = a_projectionMatrix * a_viewMatrix * m_spearTransform;
 	m_normalMapShader.bindUniform("ProjectionViewModel", pvm);
 	m_normalMapShader.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
-
+	
 	m_normalMapShader.bindUniform("AmbientColour", m_ambientLight );
 	m_normalMapShader.bindUniform("LightColour", m_light.colour );
 	m_normalMapShader.bindUniform("LightDirection", m_light.direction );
@@ -452,6 +468,24 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 	// Draw the mesh
 	m_spearMesh.draw();
 
+#pragma endregion
+
+
+#pragma region Sword
+
+	m_normalMapShader.bind();
+	// Bind the transform
+	pvm = a_projectionMatrix * a_viewMatrix * m_swordTransform;
+	m_normalMapShader.bindUniform("ProjectionViewModel", pvm);
+	m_normalMapShader.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
+
+	m_normalMapShader.bindUniform("AmbientColour", m_ambientLight);
+	m_normalMapShader.bindUniform("LightColour", m_light.colour);
+	m_normalMapShader.bindUniform("LightDirection", m_light.direction);
+
+	m_normalMapShader.bindUniform("ModelMatrix", m_spearTransform);
+	// Draw the mesh
+	m_swordMesh.draw();
 #pragma endregion
 
 
@@ -470,6 +504,7 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::DragFloat3("Buddha pos", &m_buddhaTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Lucy pos", &m_lucyTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Spear pos", &m_spearTransform[3][0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Sword pos", &m_swordTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::End();
 
 	ImGui::Begin("Translate");

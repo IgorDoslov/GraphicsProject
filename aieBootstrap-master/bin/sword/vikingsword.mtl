@@ -1,0 +1,12 @@
+# File produced by Open Asset Import Library (http://www.assimp.sf.net)
+# (assimp v3.1.206520482)
+
+newmtl 1001
+illum 2
+Kd 0.702 0.2784 0.1922
+Ka 0.702 0.2784 0.1922
+Ks 0 0 0
+specularPower 40
+map_Kd ldsword_swordcomposite_BaseColor.tga
+map_Ks swordcomposite_Roughness.tga
+bump ldsword_swordcomposite_Normal.tga
