@@ -41,6 +41,8 @@ bool GraphicsProjectApp::startup() {
 
 	m_lights.push_back(Light{ glm::vec3{ 1, 0, 0 }, 3.0f * glm::vec3{1,1,1} });
 	m_lights.push_back(Light{ glm::vec3{ -1, 0, 0 }, 3.0f * glm::vec3{1,0,0} });
+	//m_lights.push_back(Light{ glm::vec3{ 0, -1, 0 }, 3.0f * glm::vec3{0,1,0} });
+
 
 
 	m_cameras.push_back(Camera());
@@ -346,12 +348,13 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 
 #pragma region Soulspear
+	// Load spear obj file
 	if (m_spearMesh.load("./soulspear/soulspear.obj", true, true) == false)
 	{
 		printf("Soulspear Mesh has had an error!\n");
 		return false;
 	}
-
+	// Spear position
 	m_spearTransform = {
 	1.f, 0, 0, 0,
 	0, 1.f, 0, 0,
@@ -361,12 +364,13 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 #pragma endregion
 
 #pragma region Sword
+	// Load sword obj file
 	if (m_swordMesh.load("./sword/vikingsword.obj", true, true) == false)
 	{
 		printf("sword Mesh has had an error!\n");
 		return false;
 	}
-
+	// Sword position
 	m_swordTransform = {
 	0.01f, 0, 0, 0,
 	0, 0.01f, 0, 0,
@@ -382,6 +386,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::mat4 a_viewMatrix)
 {
+	// Calculate the projection view matrix
 	auto pvm = a_projectionMatrix * a_viewMatrix * glm::mat4(0);
 
 #pragma region Quad
@@ -482,6 +487,8 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 	std::vector<glm::vec3> lightColours;
 	std::vector<glm::vec3> lightDirs;
 
+	// Separate the direction and colour of each light into their own vectors 
+	// so that we can bind each separately to the shader
 	for (auto& lc : m_lights)
 	{
 		lightColours.push_back(lc.colour);
@@ -493,12 +500,19 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 	m_normalMapMultiLights.bind();
 	// Bind the transform
 	pvm = a_projectionMatrix * a_viewMatrix * m_spearTransform;
+
 	m_normalMapMultiLights.bindUniform("ProjectionViewModel", pvm);
+
 	m_normalMapMultiLights.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
+
 	m_normalMapMultiLights.bindUniform("AmbientColour", m_ambientLight);
+
 	m_normalMapMultiLights.bindUniform("LightColour", (int)lightColours.size(), lightColours.data());
+
 	m_normalMapMultiLights.bindUniform("LightDirection", (int)lightDirs.size(), lightDirs.data());
+
 	m_normalMapMultiLights.bindUniform("lightCount", (int)lightColours.size());
+
 	m_normalMapMultiLights.bindUniform("ModelMatrix", m_spearTransform);
 	// Draw the mesh
 	m_spearMesh.draw();
@@ -508,18 +522,18 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 
 #pragma region Sword
 
-	//m_normalMapMultiLights.bind();
-	//// Bind the transform
-	//pvm = a_projectionMatrix * a_viewMatrix * m_swordTransform;
-	//m_normalMapMultiLights.bindUniform("ProjectionViewModel", pvm);
-	//m_normalMapMultiLights.bindUniform("ModelMatrix", m_spearTransform);
-	//m_normalMapMultiLights.bindUniform("AmbientColour", m_ambientLight);
-	//m_normalMapMultiLights.bindUniform("LightColour", (int)lightColours.size(), lightColours.data());
-	//m_normalMapMultiLights.bindUniform("LightDirection", (int)lightDirs.size(), lightDirs.data());
-	//m_normalMapMultiLights.bindUniform("lightCount", (int)lightColours.size());
-	//m_normalMapMultiLights.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
-	//// Draw the mesh
-	//m_swordMesh.draw();
+	m_normalMapMultiLights.bind();
+	// Bind the transform
+	pvm = a_projectionMatrix * a_viewMatrix * m_swordTransform;
+	m_normalMapMultiLights.bindUniform("ProjectionViewModel", pvm);
+	m_normalMapMultiLights.bindUniform("ModelMatrix", m_spearTransform);
+	m_normalMapMultiLights.bindUniform("AmbientColour", m_ambientLight);
+	m_normalMapMultiLights.bindUniform("LightColour", (int)lightColours.size(), lightColours.data());
+	m_normalMapMultiLights.bindUniform("LightDirection", (int)lightDirs.size(), lightDirs.data());
+	m_normalMapMultiLights.bindUniform("lightCount", (int)lightColours.size());
+	m_normalMapMultiLights.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
+	// Draw the mesh
+	m_swordMesh.draw();
 #pragma endregion
 
 
@@ -527,11 +541,13 @@ void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::
 
 void GraphicsProjectApp::IMGUI_Logic()
 {
+	// Change light direction and colour in the scene
 	ImGui::Begin("Scene Light Settings");
 	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.f, 1.f);
 	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.f, 2.0f);
 	ImGui::End();
 
+	// These allow you to move the models around in the scene
 	ImGui::Begin("Object Positions");
 	ImGui::DragFloat3("Bunny pos", &m_bunnyTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Dragon pos", &m_dragonTransform[3][0], 0.1f, -20.f, 20.0f);
@@ -541,6 +557,7 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::DragFloat3("Sword pos", &m_swordTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::End();
 
+	// Make the bunny translate
 	ImGui::Begin("Translate");
 	ImGui::DragFloat3("Bunny", &m_bunnyPosition[0], 0.1f, -20.f, 20.0f);
 	ImGui::End();

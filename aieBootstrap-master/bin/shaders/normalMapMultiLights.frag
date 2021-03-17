@@ -16,7 +16,7 @@ uniform vec3 Kd; // THe diffuse colour of the model's material
 uniform vec3 Ks; // The specular colour of the model's material
 uniform float Ns; // The specular power of the model's material
 
-const int lightLimit = 2;
+const int lightLimit = 3;
 
 uniform vec3 AmbientColour; // Ambient colour of the light
 uniform vec3 LightColour[lightLimit]; // Colour of the light
