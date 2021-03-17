@@ -7,7 +7,7 @@ illum 2
 Ka 0.800000 0.800000 0.800000
 Kd 0.800000 0.800000 0.800000
 Ks 0.800000 0.800000 0.800000
-specularPower 40
+Ns 40
 map_Ka ldsword_swordcomposite_BaseColor.tga
 map_Kd ldsword_swordcomposite_BaseColor.tga
 map_Ks swordcomposite_Roughness.tga

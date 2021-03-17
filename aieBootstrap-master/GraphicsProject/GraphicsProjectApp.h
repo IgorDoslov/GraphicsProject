@@ -39,6 +39,8 @@ protected:
 	aie::ShaderProgram m_phongShader;
 	aie::ShaderProgram m_textureShader;
 	aie::ShaderProgram m_normalMapShader;
+	aie::ShaderProgram m_normalMapMultiLights;
+
 
 	// ==============
 	// Basic plane
@@ -73,15 +75,17 @@ protected:
 	glm::mat4 m_swordTransform;
 
 	struct Light {
+
 		glm::vec3 direction;
 		glm::vec3 colour;
+		
 	};
 
 	Light m_light;
 	glm::vec3 m_ambientLight;
+	
 
-
-
+	std::vector<Light> m_lights;
 	glm::vec3 m_camPosition = glm::vec3(15);
 
 public:

@@ -18,6 +18,8 @@ public:
 
 	virtual void Draw();
 
+	
+
 protected:
 
 	unsigned int triCount;

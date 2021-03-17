@@ -2,6 +2,9 @@
 #include <cstdio>
 #include <cassert>
 #include "gl_core_4_4.h"
+#include <string>
+#include <fstream>
+#include <streambuf>
 
 namespace aie {
 
@@ -22,9 +25,13 @@ bool Shader::loadShader(unsigned int stage, const char* filename) {
 	case eShaderStage::FRAGMENT:	m_handle = glCreateShader(GL_FRAGMENT_SHADER);	break;
 	default:	break;
 	};
+
+	std::ifstream shaderFile(filename);
+	std::string shaderSrc = std::string(std::istreambuf_iterator<char>(shaderFile), std::istreambuf_iterator<char>());
+	const char* shaderSrcPtr = shaderSrc.c_str();
 	
 	// open file
-	FILE* file = nullptr;
+	/*FILE* file = nullptr;
 	fopen_s(&file, filename, "rb");
 	fseek(file, 0, SEEK_END);
 	unsigned int size = ftell(file);
@@ -32,12 +39,14 @@ bool Shader::loadShader(unsigned int stage, const char* filename) {
 	fseek(file, 0, SEEK_SET);
 	fread_s(source, size + 1, sizeof(char), size, file);
 	fclose(file);
-	source[size] = 0;
+	source[size] = 0;*/
 
-	glShaderSource(m_handle, 1, (const char**)&source, 0);
+	printf("%s\n\n", shaderSrcPtr);
+
+	glShaderSource(m_handle, 1, &shaderSrcPtr, 0);
 	glCompileShader(m_handle);
 
-	delete[] source;
+	// delete[] source;
 
 	int success = GL_TRUE;
 	glGetShaderiv(m_handle, GL_LINK_STATUS, &success);
@@ -48,6 +57,8 @@ bool Shader::loadShader(unsigned int stage, const char* filename) {
 		delete[] m_lastError;
 		m_lastError = new char[infoLogLength];
 		glGetShaderInfoLog(m_handle, infoLogLength, 0, m_lastError);
+
+		printf("%s", m_lastError);
 		return false;
 	}
 
@@ -68,7 +79,7 @@ bool Shader::createShader(unsigned int stage, const char* string) {
 	default:	break;
 	};
 
-	glShaderSource(m_handle, 1, (const char**)&string, 0);
+	glShaderSource(m_handle, 1, &string, 0);
 	glCompileShader(m_handle);
 	
 	int success = GL_TRUE;
@@ -108,16 +119,23 @@ void ShaderProgram::attachShader(const std::shared_ptr<Shader>& shader) {
 	m_shaders[shader->getStage()] = shader;
 }
 
+
 bool ShaderProgram::link() {
 	m_program = glCreateProgram();
+
 	for (auto& s : m_shaders)
-		if (s != nullptr)
+	{
+		printf("%x", s.get());
+		if (s != nullptr && s.get() != nullptr)
 			glAttachShader(m_program, s->getHandle());
+	}
+
+
 	glLinkProgram(m_program);
 
 	int success = GL_TRUE;
 	glGetProgramiv(m_program, GL_LINK_STATUS, &success);
-	if (success == GL_FALSE) {
+	if (success == GL_FALSE && false) {
 		int infoLogLength = 0;
 		glGetProgramiv(m_program, GL_INFO_LOG_LENGTH, &infoLogLength);
 

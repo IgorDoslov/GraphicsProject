@@ -1,7 +1,7 @@
 // a simple shader
-#version 410
+#version 400
 
-layout(location = 0) in vec4 Position;
+in vec4 Position;
 
 uniform mat4 ProjectionViewModel;
 uniform vec4 MeshFlatColour;
@@ -19,3 +19,4 @@ void main(){
 
     gl_Position = ProjectionViewModel * Position;
 }
+
