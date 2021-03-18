@@ -5,14 +5,15 @@
 #include <glm/ext.hpp>
 #include <imgui.h>
 #include <vector>
-
+#include "Scene.h"
+#include "Instance.h"
 
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
 
-GraphicsProjectApp::GraphicsProjectApp() : m_ambientLight(), m_bunnyTransform(), m_buddhaTransform(), m_dragonTransform(), m_lucyTransform(), m_light(), m_projectionMatrix(), m_quadTransform(), m_viewMatrix()
+GraphicsProjectApp::GraphicsProjectApp() //: m_ambientLight(), m_bunnyTransform(), m_buddhaTransform(), m_dragonTransform(), m_lucyTransform(), m_light(), m_projectionMatrix(), m_quadTransform(), m_viewMatrix()
 {
 
 
@@ -39,22 +40,25 @@ bool GraphicsProjectApp::startup() {
 	//m_light.colour = { 1, 1, 1 };
 	//m_ambientLight = { 0.5f, 0.5f, 0.5f };
 
-	m_lights.push_back(Light{ glm::vec3{ 1, 0, 0 }, 3.0f * glm::vec3{1,1,1} });
-	m_lights.push_back(Light{ glm::vec3{ -1, 0, 0 }, 3.0f * glm::vec3{1,0,0} });
+	//m_lights.push_back(Light{ glm::vec3{ 1, 0, 0 }, 3.0f * glm::vec3{1,1,1} });
+	//m_lights.push_back(Light{ glm::vec3{ -1, 0, 0 }, 3.0f * glm::vec3{1,0,0} });
 	//m_lights.push_back(Light{ glm::vec3{ 0, -1, 0 }, 3.0f * glm::vec3{0,1,0} });
 
-
+	Light light;
+	light.m_colour = { 1, 1, 1 };
+	light.m_direction = { 1, -1, 1 };
 
 	m_cameras.push_back(Camera());
 	m_cameras.push_back(Camera());
 
 
-	return LoadShaderAndMeshLogic();
+	return LoadShaderAndMeshLogic(light);
 }
 
 void GraphicsProjectApp::shutdown() {
 
 	Gizmos::destroy();
+	delete m_scene;
 }
 
 void GraphicsProjectApp::update(float deltaTime) {
@@ -62,7 +66,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
-	
+
 
 	// draw a simple grid with gizmos
 	vec4 white(1);
@@ -76,6 +80,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 			i == 10 ? white : black);
 	}
 	float time = getTime();
+	Gizmos::addSphere(m_scene->GetLight().m_direction, 0.5f, 8, 8, glm::vec4(1));
 	//Gizmos::addSphere(vec3(0, 0, 0), 1, 16, 16, vec4(1, 1, 0, 1));
 	//Gizmos::addSphere(-vec3(glm::cos(time * 5.f), 0.f, glm::sin(time * 5.0f)), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
 	//Gizmos::addSphere(-vec3(glm::cos(time * 2.f), 0.f, glm::sin(time * 2.f)) + vec3(6.f), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
@@ -93,29 +98,30 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
 
-	//m_camera.Update(deltaTime);
-	m_cameras[m_currentCamera].Update(deltaTime);
+	m_camera.Update(deltaTime);
+	//m_cameras[m_currentCamera].Update(deltaTime);
 
 	IMGUI_Logic();
-	for (auto& l : m_lights)
+
+	/*for (auto& l : m_lights)
 	{
 		float x = l.direction.x;
 		float z = l.direction.z;
 		l.direction.x = glm::cos(deltaTime) * x - glm::sin(deltaTime) * z;
 		l.direction.z = glm::sin(deltaTime) * x + glm::cos(deltaTime) * z;
 
-	}
+	}*/
 
-	/*m_light.direction = glm::normalize(glm::vec3(glm::cos(time * 2),
+	m_scene->GetLight().m_direction = glm::normalize(glm::vec3(glm::cos(time * 2),
 		(glm::sin(time * 2)),
-		0));*/
+		0));
 
-	// quit if we press escape
+		// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
 	if (input->wasKeyPressed(aie::INPUT_KEY_UP))
 	{
-		if (m_currentCamera < m_cameras.size()-1)
+		if (m_currentCamera < m_cameras.size() - 1)
 		{
 			m_currentCamera++;
 		}
@@ -137,18 +143,22 @@ void GraphicsProjectApp::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
-	glm::mat4 projectionMatrix = m_cameras[m_currentCamera].GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
-	glm::mat4 viewMatrix = m_cameras[m_currentCamera].GetViewMatrix();
+	//glm::mat4 projectionMatrix = m_cameras[m_currentCamera].GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
+	//glm::mat4 viewMatrix = m_cameras[m_currentCamera].GetViewMatrix();
+
+	glm::mat4 projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
+	glm::mat4 viewMatrix = m_camera.GetViewMatrix();
 
 	// update perspective based on screen size
 	//m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
-	 DrawShaderAndMeshes(m_projectionMatrix, viewMatrix);
+	 //DrawShaderAndMeshes(m_projectionMatrix, viewMatrix);
+	m_scene->Draw();
 
 	Gizmos::draw(projectionMatrix * viewMatrix);
 }
 
-bool GraphicsProjectApp::LoadShaderAndMeshLogic()
+bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 {
 #pragma region Quad
 
@@ -288,7 +298,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 #pragma endregion
 
-	
+
 
 #pragma region Phong Load
 	m_phongShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/phong.vert");
@@ -379,172 +389,182 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic()
 
 #pragma endregion
 
+	m_scene = new Scene(&m_camera, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
+
+	for (int i = 0; i < 10; i++)
+	{
+		m_scene->AddInstance(new Instance(glm::vec3(i * 2, 0, 0), 
+			glm::vec3(0, i*30, 0), 
+			glm::vec3(1), 
+			&m_spearMesh, 
+			&m_normalMapShader));
+	}
 
 
 	return true;
 }
 
-void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::mat4 a_viewMatrix)
-{
-	// Calculate the projection view matrix
-	auto pvm = a_projectionMatrix * a_viewMatrix * glm::mat4(0);
-
-#pragma region Quad
-
-	// Bind the shader
-	//m_textureShader.bind();
-
-	// Bind the transform of the mesh
-	//pvm = a_projectionMatrix * a_viewMatrix * m_quadTransform; // PVM = Projection View Matrix
-	//m_textureShader.bindUniform("ProjectionViewModel", pvm);
-
-	// Bind the texture to a location of your choice (0)
-	//m_textureShader.bindUniform("diffuseTexture", 0);
-
-	// Bind the texture to the specified location
-	//m_gridTexture.bind(0);
-
-	// Draw the quad...
-	//m_quadMesh.Draw();
-#pragma endregion
-
-#pragma region FlatBunny
-	//m_bunnyShader.bind();
-	//pvm = a_projectionMatrix * a_viewMatrix * m_bunnyTransform;
-	//m_bunnyShader.bindUniform("ProjectionViewModel", pvm);
-	//m_bunnyShader.bindUniform("MeshFlatColour", glm::vec4(0, 1, 0, 1));
-
-	// Draw bunny mesh
-	//m_bunnyMesh.draw();
-
-
-#pragma endregion
-
-#pragma region Phong Shader
-
-	// Bind the shader
-	//m_phongShader.bind();
-
-	// Bind the camera position
-	//m_phongShader.bindUniform("CameraPosition", vec3(glm::inverse(a_viewMatrix)[3]));
-
-	//m_phongShader.bindUniform("AmbientColour", m_ambientLight);
-	//m_phongShader.bindUniform("LightColour", m_light.colour);
-	//m_phongShader.bindUniform("LightDirection", m_light.direction);
-
-	// Bind the light
-	//m_phongShader.bindUniform("LightDirection", m_light.direction);
-
-#pragma region Bunny
-
-	// Bind the PVM
-	//pvm = a_projectionMatrix * a_viewMatrix * m_bunnyTransform;
-	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
-
-	// Bind the lighting transforms
-	//m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
-
-	//m_bunnyMesh.draw();
-#pragma endregion
-
-#pragma region Dragon
-
-	// Bind the PVM
-	//pvm = a_projectionMatrix * a_viewMatrix * m_dragonTransform;
-	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
-
-	// Bind the lighting transforms
-	//m_phongShader.bindUniform("ModelMatrix", m_dragonTransform);
-
-	//m_dragonMesh.draw();
-#pragma endregion
-
-#pragma region Buddha
-	// Bind the PVM
-	//pvm = a_projectionMatrix * a_viewMatrix * m_buddhaTransform;
-	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
-
-	// Bind the lighting transforms
-	//m_phongShader.bindUniform("ModelMatrix", m_buddhaTransform);
-
-	//m_buddhaMesh.draw();
-#pragma endregion
-
-#pragma region Lucy
-	// Bind the PVM
-	//pvm = a_projectionMatrix * a_viewMatrix * m_lucyTransform;
-	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
-
-	// Bind the lighting transforms
-	//m_phongShader.bindUniform("ModelMatrix", m_lucyTransform);
-
-	//m_lucyMesh.draw();
-#pragma endregion
-
-
-#pragma endregion
-
-	std::vector<glm::vec3> lightColours;
-	std::vector<glm::vec3> lightDirs;
-
-	// Separate the direction and colour of each light into their own vectors 
-	// so that we can bind each separately to the shader
-	for (auto& lc : m_lights)
-	{
-		lightColours.push_back(lc.colour);
-		lightDirs.push_back(lc.direction);
-
-	}
-
-#pragma region Soulspear
-	m_normalMapMultiLights.bind();
-	// Bind the transform
-	pvm = a_projectionMatrix * a_viewMatrix * m_spearTransform;
-
-	m_normalMapMultiLights.bindUniform("ProjectionViewModel", pvm);
-
-	m_normalMapMultiLights.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
-
-	m_normalMapMultiLights.bindUniform("AmbientColour", m_ambientLight);
-
-	m_normalMapMultiLights.bindUniform("LightColour", (int)lightColours.size(), lightColours.data());
-
-	m_normalMapMultiLights.bindUniform("LightDirection", (int)lightDirs.size(), lightDirs.data());
-
-	m_normalMapMultiLights.bindUniform("lightCount", (int)lightColours.size());
-
-	m_normalMapMultiLights.bindUniform("ModelMatrix", m_spearTransform);
-	// Draw the mesh
-	m_spearMesh.draw();
-
-#pragma endregion
-
-
-#pragma region Sword
-
-	m_normalMapMultiLights.bind();
-	// Bind the transform
-	pvm = a_projectionMatrix * a_viewMatrix * m_swordTransform;
-	m_normalMapMultiLights.bindUniform("ProjectionViewModel", pvm);
-	m_normalMapMultiLights.bindUniform("ModelMatrix", m_spearTransform);
-	m_normalMapMultiLights.bindUniform("AmbientColour", m_ambientLight);
-	m_normalMapMultiLights.bindUniform("LightColour", (int)lightColours.size(), lightColours.data());
-	m_normalMapMultiLights.bindUniform("LightDirection", (int)lightDirs.size(), lightDirs.data());
-	m_normalMapMultiLights.bindUniform("lightCount", (int)lightColours.size());
-	m_normalMapMultiLights.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
-	// Draw the mesh
-	m_swordMesh.draw();
-#pragma endregion
-
-
-}
+//void GraphicsProjectApp::DrawShaderAndMeshes(glm::mat4 a_projectionMatrix, glm::mat4 a_viewMatrix)
+//{
+//	// Calculate the projection view matrix
+//	auto pvm = a_projectionMatrix * a_viewMatrix * glm::mat4(0);
+//
+//#pragma region Quad
+//
+//	// Bind the shader
+//	//m_textureShader.bind();
+//
+//	// Bind the transform of the mesh
+//	//pvm = a_projectionMatrix * a_viewMatrix * m_quadTransform; // PVM = Projection View Matrix
+//	//m_textureShader.bindUniform("ProjectionViewModel", pvm);
+//
+//	// Bind the texture to a location of your choice (0)
+//	//m_textureShader.bindUniform("diffuseTexture", 0);
+//
+//	// Bind the texture to the specified location
+//	//m_gridTexture.bind(0);
+//
+//	// Draw the quad...
+//	//m_quadMesh.Draw();
+//#pragma endregion
+//
+//#pragma region FlatBunny
+//	//m_bunnyShader.bind();
+//	//pvm = a_projectionMatrix * a_viewMatrix * m_bunnyTransform;
+//	//m_bunnyShader.bindUniform("ProjectionViewModel", pvm);
+//	//m_bunnyShader.bindUniform("MeshFlatColour", glm::vec4(0, 1, 0, 1));
+//
+//	// Draw bunny mesh
+//	//m_bunnyMesh.draw();
+//
+//
+//#pragma endregion
+//
+//#pragma region Phong Shader
+//
+//	// Bind the shader
+//	//m_phongShader.bind();
+//
+//	// Bind the camera position
+//	//m_phongShader.bindUniform("CameraPosition", vec3(glm::inverse(a_viewMatrix)[3]));
+//
+//	//m_phongShader.bindUniform("AmbientColour", m_ambientLight);
+//	//m_phongShader.bindUniform("LightColour", m_light.colour);
+//	//m_phongShader.bindUniform("LightDirection", m_light.direction);
+//
+//	// Bind the light
+//	//m_phongShader.bindUniform("LightDirection", m_light.direction);
+//
+//#pragma region Bunny
+//
+//	// Bind the PVM
+//	//pvm = a_projectionMatrix * a_viewMatrix * m_bunnyTransform;
+//	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
+//
+//	// Bind the lighting transforms
+//	//m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
+//
+//	//m_bunnyMesh.draw();
+//#pragma endregion
+//
+//#pragma region Dragon
+//
+//	// Bind the PVM
+//	//pvm = a_projectionMatrix * a_viewMatrix * m_dragonTransform;
+//	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
+//
+//	// Bind the lighting transforms
+//	//m_phongShader.bindUniform("ModelMatrix", m_dragonTransform);
+//
+//	//m_dragonMesh.draw();
+//#pragma endregion
+//
+//#pragma region Buddha
+//	// Bind the PVM
+//	//pvm = a_projectionMatrix * a_viewMatrix * m_buddhaTransform;
+//	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
+//
+//	// Bind the lighting transforms
+//	//m_phongShader.bindUniform("ModelMatrix", m_buddhaTransform);
+//
+//	//m_buddhaMesh.draw();
+//#pragma endregion
+//
+//#pragma region Lucy
+//	// Bind the PVM
+//	//pvm = a_projectionMatrix * a_viewMatrix * m_lucyTransform;
+//	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
+//
+//	// Bind the lighting transforms
+//	//m_phongShader.bindUniform("ModelMatrix", m_lucyTransform);
+//
+//	//m_lucyMesh.draw();
+//#pragma endregion
+//
+//
+//#pragma endregion
+//
+//	std::vector<glm::vec3> lightColours;
+//	std::vector<glm::vec3> lightDirs;
+//
+//	// Separate the direction and colour of each light into their own vectors 
+//	// so that we can bind each separately to the shader
+//	for (auto& lc : m_lights)
+//	{
+//		lightColours.push_back(lc.colour);
+//		lightDirs.push_back(lc.direction);
+//
+//	}
+//
+//#pragma region Soulspear
+//	m_normalMapMultiLights.bind();
+//	// Bind the transform
+//	pvm = a_projectionMatrix * a_viewMatrix * m_spearTransform;
+//
+//	m_normalMapMultiLights.bindUniform("ProjectionViewModel", pvm);
+//
+//	m_normalMapMultiLights.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
+//
+//	m_normalMapMultiLights.bindUniform("AmbientColour", m_ambientLight);
+//
+//	m_normalMapMultiLights.bindUniform("LightColour", (int)lightColours.size(), lightColours.data());
+//
+//	m_normalMapMultiLights.bindUniform("LightDirection", (int)lightDirs.size(), lightDirs.data());
+//
+//	m_normalMapMultiLights.bindUniform("lightCount", (int)lightColours.size());
+//
+//	m_normalMapMultiLights.bindUniform("ModelMatrix", m_spearTransform);
+//	// Draw the mesh
+//	m_spearMesh.draw();
+//
+//#pragma endregion
+//
+//
+//#pragma region Sword
+//
+//	m_normalMapMultiLights.bind();
+//	// Bind the transform
+//	pvm = a_projectionMatrix * a_viewMatrix * m_swordTransform;
+//	m_normalMapMultiLights.bindUniform("ProjectionViewModel", pvm);
+//	m_normalMapMultiLights.bindUniform("ModelMatrix", m_spearTransform);
+//	m_normalMapMultiLights.bindUniform("AmbientColour", m_ambientLight);
+//	m_normalMapMultiLights.bindUniform("LightColour", (int)lightColours.size(), lightColours.data());
+//	m_normalMapMultiLights.bindUniform("LightDirection", (int)lightDirs.size(), lightDirs.data());
+//	m_normalMapMultiLights.bindUniform("lightCount", (int)lightColours.size());
+//	m_normalMapMultiLights.bindUniform("CameraPosition", m_cameras[m_currentCamera].GetPosition());
+//	// Draw the mesh
+//	m_swordMesh.draw();
+//#pragma endregion
+//
+//
+//}
 
 void GraphicsProjectApp::IMGUI_Logic()
 {
 	// Change light direction and colour in the scene
 	ImGui::Begin("Scene Light Settings");
-	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.f, 1.f);
-	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.f, 2.0f);
+	ImGui::DragFloat3("Sunlight Direction", &m_scene->GetLight().m_direction[0], 0.1f, -1.f, 1.f);
+	ImGui::DragFloat3("Sunlight Colour", &m_scene->GetLight().m_colour[0], 0.1f, 0.f, 2.0f);
 	ImGui::End();
 
 	// These allow you to move the models around in the scene

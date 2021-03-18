@@ -7,6 +7,8 @@
 #include "OBJMesh.h"
 #include "Camera.h"
 #include <Vector>
+#include "Scene.h"
+
 
 class GraphicsProjectApp : public aie::Application {
 public:
@@ -24,7 +26,7 @@ protected:
 
 	int m_currentCamera = 0;
 	
-	//Camera m_camera;
+	Camera m_camera;
 	std::vector<Camera> m_cameras;
 
 	// camera transforms
@@ -74,22 +76,24 @@ protected:
 	aie::OBJMesh m_swordMesh;
 	glm::mat4 m_swordTransform;
 
-	struct Light {
+	Scene* m_scene;
+
+	/*struct Light {
 
 		glm::vec3 direction;
 		glm::vec3 colour;
 		
-	};
+	};*/
 
-	Light m_light;
-	glm::vec3 m_ambientLight;
+	//Light m_light;
+	//glm::vec3 m_ambientLight;
 	
 
-	std::vector<Light> m_lights;
+	//std::vector<Light> m_lights;
 	glm::vec3 m_camPosition = glm::vec3(15);
 
 public:
-	bool LoadShaderAndMeshLogic();
-	void DrawShaderAndMeshes(glm::mat4, glm::mat4);
+	bool LoadShaderAndMeshLogic(Light a_light);
+	// void DrawShaderAndMeshes(glm::mat4, glm::mat4);
 	void IMGUI_Logic();
 };
