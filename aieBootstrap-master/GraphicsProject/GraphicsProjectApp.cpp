@@ -8,10 +8,16 @@
 #include "Scene.h"
 #include "Instance.h"
 
+
+#define GLM_ENABLE_EXPERIMENTAL #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
+
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
+
 
 GraphicsProjectApp::GraphicsProjectApp() //: m_ambientLight(), m_bunnyTransform(), m_buddhaTransform(), m_dragonTransform(), m_lucyTransform(), m_light(), m_projectionMatrix(), m_quadTransform(), m_viewMatrix()
 {
@@ -48,9 +54,10 @@ bool GraphicsProjectApp::startup() {
 	light.m_colour = { 1, 1, 1 };
 	light.m_direction = { 1, -1, 1 };
 
-
-	//m_cameras.push_back(Camera());
-	//m_cameras.push_back(Camera());
+	/*m_positions[0] = glm::vec3(10, 5, 10);
+	m_positions[1] = glm::vec3(-10, 0, -10);
+	m_rotations[0] = glm::quat(glm::vec3(0, -1, 0));
+	m_rotations[1] = glm::quat(glm::vec3(0, 1, 0));*/
 
 
 	return LoadShaderAndMeshLogic(light);
@@ -81,7 +88,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 			i == 10 ? white : black);
 	}
 	float time = getTime();
-	Gizmos::addSphere(-5.0f * m_scene->GetLight().m_direction, 0.25f, 8, 8, glm::vec4(m_scene->GetLight().m_colour,1));
+	Gizmos::addSphere(-5.0f * m_scene->GetLight().m_direction, 0.25f, 8, 8, glm::vec4(m_scene->GetLight().m_colour, 1));
 	//Gizmos::addSphere(m_scene->GetPointLightPositions()[0], 0.25f, 8, 8, glm::vec4(1,0,0,1));
 	Gizmos::addSphere(m_scene->GetPointLightPositions()[0], 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[0].m_colour, 1));
 	Gizmos::addSphere(m_scene->GetPointLightPositions()[1], 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[1].m_colour, 1));
@@ -108,23 +115,11 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// Only one camera can move
 	if (m_scene->currentCam == 0)
 		m_scene->GetCurrentCam()->Update(deltaTime);
-	//m_scene->m_cameras.push_back(m_cam1);
-	//for (auto cam : m_scene->m_cameras)
-	//{
-	//	cam.Update(deltaTime);
-	//}
-	//m_cameras[m_currentCamera].Update(deltaTime);
+
 	//m_scene->Update(deltaTime);
 	IMGUI_Logic();
 
-	/*for (auto& l : m_lights)
-	{
-		float x = l.direction.x;
-		float z = l.direction.z;
-		l.direction.x = glm::cos(deltaTime) * x - glm::sin(deltaTime) * z;
-		l.direction.z = glm::sin(deltaTime) * x + glm::cos(deltaTime) * z;
 
-	}*/
 
 	m_scene->GetLight().m_direction = glm::normalize(glm::vec3(glm::cos(time * 2),
 		(glm::sin(time * 2)),
@@ -133,20 +128,63 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
-	/*if (input->wasKeyPressed(aie::INPUT_KEY_UP))
-	{
-		if (m_currentCamera < m_cameras.size() - 1)
-		{
-			m_currentCamera++;
-		}
-	}
-	if (input->wasKeyPressed(aie::INPUT_KEY_DOWN))
-	{
-		if (m_currentCamera > 0)
-		{
-			m_currentCamera--;
-		}
-	}*/
+	//// use time to animate a alue between [0, 1]
+	//float s = glm::cos(getTime()) * 0.5f + 0.5f;
+	//// standard linear interpolation
+	//glm::vec3 p = (1.0f - s) * m_positions[0] + s * m_positions[1];
+	//// quaternion slerp
+	//glm::quat r = glm::slerp(m_rotations[0], m_rotations[1], s);
+	//// build a matrix
+	//glm::mat4 m = glm::translate(p) * glm::toMat4(r);
+	//// draw a transform and box
+	//Gizmos::addTransform(m);
+	//Gizmos::addAABBFilled(p, glm::vec3(.5f), glm::vec4(1, 0, 0, 1), &m);
+
+
+	m_hipFrames[0].position = glm::vec3(0, 5, 0);
+	m_hipFrames[0].rotation = glm::quat(glm::vec3(1, 0, 0));
+	m_hipFrames[1].position = glm::vec3(0, 5, 0);
+	m_hipFrames[1].rotation = glm::quat(glm::vec3(-1, 0, 0));
+
+	m_kneeFrames[0].position = glm::vec3(0, -2.5f, 0);
+	m_kneeFrames[0].rotation = glm::quat(glm::vec3(1, 0, 0));
+	m_kneeFrames[1].position = glm::vec3(0, -2.5f, 0);
+	m_kneeFrames[1].rotation = glm::quat(glm::vec3(0, 0, 0));
+
+	m_ankleFrames[0].position = glm::vec3(0, -2.5f, 0);
+	m_ankleFrames[0].rotation = glm::quat(glm::vec3(-1, 0, 0));
+	m_ankleFrames[1].position = glm::vec3(0, -2.5f, 0);
+	m_ankleFrames[1].rotation = glm::quat(glm::vec3(0, 0, 0));
+
+	// animate leg
+	float s = glm::cos(getTime()) * 0.5f + 0.5f;
+	// linearly interpolate hip position
+	glm::vec3 p = (1.0f - s) * m_hipFrames[0].position +
+		s * m_hipFrames[1].position;
+	// spherically interpolate hip rotation
+	glm::quat r = glm::slerp(m_hipFrames[0].rotation,
+		m_hipFrames[1].rotation, s);
+	// update the hip bone
+	m_hipBone = glm::translate(p) * glm::toMat4(r);
+
+	glm::vec3 hipPos = glm::vec3(m_hipBone[3].x,
+		m_hipBone[3].y,
+		m_hipBone[3].z);
+
+	glm::vec3 kneePos = glm::vec3(m_kneeBone[3].x,
+		m_kneeBone[3].y,
+		m_kneeBone[3].z);
+
+	glm::vec3 anklePos = glm::vec3(m_ankleBone[3].x,
+		m_ankleBone[3].y,
+		m_ankleBone[3].z);
+
+	glm::vec4 half(0.5f);
+	glm::vec4 pink(1, 0, 1, 1);
+
+	Gizmos::addAABBFilled(hipPos, half, pink, &m_hipBone);
+	Gizmos::addAABBFilled(kneePos, half, pink, &m_kneeBone);
+	Gizmos::addAABBFilled(anklePos, half, pink, &m_ankleBone);
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -157,16 +195,10 @@ void GraphicsProjectApp::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
-	//glm::mat4 projectionMatrix = m_cameras[m_currentCamera].GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
-	//glm::mat4 viewMatrix = m_cameras[m_currentCamera].GetViewMatrix();
-
-	glm::mat4 projectionMatrix = m_scene->GetCurrentCam()->GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
+	glm::mat4 projectionMatrix = m_scene->GetCurrentCam()->GetProjectionMatrix((float)getWindowWidth(), (float)getWindowHeight());
 	glm::mat4 viewMatrix = m_scene->GetCurrentCam()->GetViewMatrix();
 
-	// update perspective based on screen size
-	//m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
-	 //DrawShaderAndMeshes(m_projectionMatrix, viewMatrix);
 	m_scene->Draw();
 
 	Gizmos::draw(projectionMatrix * viewMatrix);
@@ -187,16 +219,6 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 		return false;
 	}
 
-	//m_quadMesh.InitialiseQuad();
-	// Define the six vertices for the two triangles that make the quad
-	/*Mesh::Vertex verticesNoIndex[6];
-	verticesNoIndex[0].position = { -0.5f, 0.f, 0.5f, 1.f };
-	verticesNoIndex[1].position = { 0.5f, 0.f, 0.5f, 1.f };
-	verticesNoIndex[2].position = { -0.5f, 0.f, -0.5f, 1.f };
-
-	verticesNoIndex[3].position = { -0.5f, 0.f, -0.5f, 1.f };
-	verticesNoIndex[4].position = { 0.5f, 0.f, 0.5f, 1.f };
-	verticesNoIndex[5].position = { 0.5f, 0.f, -0.5f, 1.f };*/
 
 	Mesh::Vertex vertices[4];
 	vertices[0].position = { -0.5f, 0.f, 0.5f, 1.f };
@@ -404,10 +426,10 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 #pragma endregion
 
 	// Creating the four cameras for the scene
-	m_cameras.push_back(new Camera(glm::vec3(1,1,1)));
-	m_cameras.push_back(new Camera(glm::vec3(0,1,0)));
-	m_cameras.push_back(new Camera(glm::vec3(3,0,0)));
-	m_cameras.push_back(new Camera(glm::vec3(4,0,0)));
+	m_cameras.push_back(new Camera(glm::vec3(1, 1, 1)));
+	m_cameras.push_back(new Camera(glm::vec3(0, 1, 0)));
+	m_cameras.push_back(new Camera(glm::vec3(3, 0, 0)));
+	m_cameras.push_back(new Camera(glm::vec3(4, 0, 0)));
 
 
 	m_scene = new Scene(m_cameras, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
@@ -636,7 +658,7 @@ void GraphicsProjectApp::IMGUI_Logic()
 	// Cameras
 	ImGui::Begin("Camera Positions");
 	ImGui::Text("Camera list");
-	ImGui::TextColored(ImVec4(0,1,0,1),("Current camera: " + std::to_string(m_scene->currentCam)).c_str());
+	ImGui::TextColored(ImVec4(0, 1, 0, 1), ("Current camera: " + std::to_string(m_scene->currentCam)).c_str());
 	for (int i = 0; i < m_scene->m_cameras.size(); i++)
 	{
 		if (ImGui::Button(("Select Camera" + std::to_string(i)).c_str(), ImVec2(100, 20)))

@@ -9,6 +9,17 @@
 #include <Vector>
 #include "Scene.h"
 
+#define GLM_ENABLE_EXPERIMENTAL #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
+
+struct KeyFrame {
+	glm::vec3 position;
+	glm::quat rotation;
+};
+
+
+
 
 class GraphicsProjectApp : public aie::Application {
 public:
@@ -25,7 +36,7 @@ public:
 protected:
 
 	int m_currentCamera = 0;
-	
+
 	Camera m_camera;
 	std::vector<Camera*> m_cameras;
 
@@ -53,7 +64,7 @@ protected:
 	// Create a bunny with a flat colour
 	aie::OBJMesh m_bunnyMesh;
 	glm::mat4 m_bunnyTransform;
-	glm::vec3 m_bunnyPosition = {0,0,0};
+	glm::vec3 m_bunnyPosition = { 0,0,0 };
 
 	// Create a dragon with a flat colour
 	aie::OBJMesh m_dragonMesh;
@@ -78,16 +89,26 @@ protected:
 
 	Scene* m_scene;
 
+	KeyFrame m_hipFrames[2];
+	KeyFrame m_kneeFrames[2];
+	KeyFrame m_ankleFrames[2];
+
+	glm::mat4 m_hipBone;
+	glm::mat4 m_kneeBone;
+	glm::mat4 m_ankleBone;
+
+	/*glm::vec3 m_positions[2];
+	glm::quat m_rotations[2];*/
 	/*struct Light {
 
 		glm::vec3 direction;
 		glm::vec3 colour;
-		
+
 	};*/
 
 	//Light m_light;
 	//glm::vec3 m_ambientLight;
-	
+
 
 	//std::vector<Light> m_lights;
 	glm::vec3 m_camPosition = glm::vec3(15);
