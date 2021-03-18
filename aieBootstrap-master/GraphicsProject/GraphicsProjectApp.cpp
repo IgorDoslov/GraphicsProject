@@ -403,6 +403,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 
 #pragma endregion
 
+	// Creating the four cameras for the scene
 	m_cameras.push_back(new Camera(glm::vec3(1,1,1)));
 	m_cameras.push_back(new Camera(glm::vec3(0,1,0)));
 	m_cameras.push_back(new Camera(glm::vec3(3,0,0)));
@@ -412,7 +413,6 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 	m_scene = new Scene(m_cameras, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
 
 	// Spear
-
 	m_scene->AddInstance(new Instance(glm::vec3(2, 0, 0),
 		glm::vec3(0, 3, 0),
 		glm::vec3(1),
@@ -608,24 +608,22 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::Begin("Scene Light Settings");
 	ImGui::DragFloat3("Sunlight Direction", &m_scene->GetLight().m_direction[0], 0.1f, -1.f, 1.f);
 	ImGui::DragFloat3("Sunlight Colour", &m_scene->GetLight().m_colour[0], 0.1f, 0.f, 2.0f);
+	ImGui::DragFloat3("light 1 position", &m_scene->GetPointLights()[0].m_direction[0], 0.1f, -50.f, 50.0f);
+	ImGui::DragFloat3("light 1 colour", &m_scene->GetPointLights()[0].m_colour[0], 0.1f, 0.0f, 2.0f);
+	ImGui::DragFloat3("light 2 position", &m_scene->GetPointLights()[1].m_direction[0], 0.1f, -50.f, 50.0f);
+	ImGui::DragFloat3("light 2 colour", &m_scene->GetPointLights()[1].m_colour[0], 0.1f, 0.0f, 2.0f);
 	ImGui::End();
 
 	// These allow you to move the models around in the scene
 	ImGui::Begin("Object Positions");
 
-	/*ImGui::DragFloat3("Dragon pos", &m_dragonTransform[3][0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Buddha pos", &m_buddhaTransform[3][0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Lucy pos", &m_lucyTransform[3][0], 0.1f, -20.f, 20.0f);*/
-	//ImGui::DragFloat3("Bunny pos", &m_scene->m_instances[2]->m_transform[3][0], 0.1f, -20.f, 20.0f);
-
 	ImGui::DragFloat3("Bunny position", &m_scene->m_instances[2]->m_pos[0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Bunny rotation", &m_scene->m_instances[2]->m_rot[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Bunny rotation", &m_scene->m_instances[2]->m_rot[0], 0.1f, -180.f, 180.0f);
 	ImGui::DragFloat3("Bunny scale", &m_scene->m_instances[2]->m_scale[0], 0.1f, -20.f, 20.0f);
 
 	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_pos[0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_rot[0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_scale[0], 0.1f, -20.f, 20.0f);
-
+	ImGui::DragFloat3("Spear rotation", &m_scene->m_instances[0]->m_rot[0], 0.1f, -180.f, 180.0f);
+	ImGui::DragFloat3("Spear scale", &m_scene->m_instances[0]->m_scale[0], 0.1f, -20.f, 20.0f);
 
 	ImGui::DragFloat3("Sword position", &m_scene->m_instances[1]->m_pos[0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Sword rotation", &m_scene->m_instances[1]->m_rot[0], 0.1f, -180.f, 180.0f);
@@ -635,17 +633,7 @@ void GraphicsProjectApp::IMGUI_Logic()
 		ins->RecalculateTransform();
 
 	ImGui::End();
-
-	ImGui::Begin("Point Light Positions");
-	ImGui::DragFloat3("light 1 pos", &m_scene->GetPointLights()[0].m_direction[0], 0.1f, -50.f, 50.0f);
-	ImGui::DragFloat3("light 2 pos", &m_scene->GetPointLights()[1].m_direction[0], 0.1f, -50.f, 50.0f);
-	ImGui::End();
-
-	ImGui::Begin("Point Light Colours");
-	ImGui::DragFloat3("light 1 colour", &m_scene->GetPointLights()[0].m_colour[0], 0.1f, 0.0f, 2.0f);
-	ImGui::DragFloat3("light 2 colour", &m_scene->GetPointLights()[1].m_colour[0], 0.1f, 0.0f, 2.0f);
-	ImGui::End();
-
+	// Cameras
 	ImGui::Begin("Camera Positions");
 	ImGui::Text("Camera list");
 	ImGui::TextColored(ImVec4(0,1,0,1),("Current camera: " + std::to_string(m_scene->currentCam)).c_str());
