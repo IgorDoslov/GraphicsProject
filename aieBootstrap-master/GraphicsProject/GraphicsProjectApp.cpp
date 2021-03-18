@@ -49,8 +49,8 @@ bool GraphicsProjectApp::startup() {
 	light.m_direction = { 1, -1, 1 };
 
 
-	m_cameras.push_back(Camera());
-	m_cameras.push_back(Camera());
+	//m_cameras.push_back(Camera());
+	//m_cameras.push_back(Camera());
 
 
 	return LoadShaderAndMeshLogic(light);
@@ -81,7 +81,13 @@ void GraphicsProjectApp::update(float deltaTime) {
 			i == 10 ? white : black);
 	}
 	float time = getTime();
-	Gizmos::addSphere(-5.0f * m_scene->GetLight().m_direction, 0.25f, 8, 8, glm::vec4(1));
+	Gizmos::addSphere(-5.0f * m_scene->GetLight().m_direction, 0.25f, 8, 8, glm::vec4(m_scene->GetLight().m_colour,1));
+	//Gizmos::addSphere(m_scene->GetPointLightPositions()[0], 0.25f, 8, 8, glm::vec4(1,0,0,1));
+	Gizmos::addSphere(m_scene->GetPointLightPositions()[0], 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[0].m_colour, 1));
+	Gizmos::addSphere(m_scene->GetPointLightPositions()[1], 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[1].m_colour, 1));
+
+
+
 	//Gizmos::addSphere(vec3(0, 0, 0), 1, 16, 16, vec4(1, 1, 0, 1));
 	//Gizmos::addSphere(-vec3(glm::cos(time * 5.f), 0.f, glm::sin(time * 5.0f)), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
 	//Gizmos::addSphere(-vec3(glm::cos(time * 2.f), 0.f, glm::sin(time * 2.f)) + vec3(6.f), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
@@ -99,7 +105,14 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
 
-	m_scene->GetCamera()->Update(deltaTime);
+	// Only one camera can move
+	if (m_scene->currentCam == 0)
+		m_scene->GetCurrentCam()->Update(deltaTime);
+	//m_scene->m_cameras.push_back(m_cam1);
+	//for (auto cam : m_scene->m_cameras)
+	//{
+	//	cam.Update(deltaTime);
+	//}
 	//m_cameras[m_currentCamera].Update(deltaTime);
 	//m_scene->Update(deltaTime);
 	IMGUI_Logic();
@@ -120,7 +133,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
-	if (input->wasKeyPressed(aie::INPUT_KEY_UP))
+	/*if (input->wasKeyPressed(aie::INPUT_KEY_UP))
 	{
 		if (m_currentCamera < m_cameras.size() - 1)
 		{
@@ -133,7 +146,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 		{
 			m_currentCamera--;
 		}
-	}
+	}*/
 
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -147,8 +160,8 @@ void GraphicsProjectApp::draw() {
 	//glm::mat4 projectionMatrix = m_cameras[m_currentCamera].GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
 	//glm::mat4 viewMatrix = m_cameras[m_currentCamera].GetViewMatrix();
 
-	glm::mat4 projectionMatrix = m_camera.GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
-	glm::mat4 viewMatrix = m_camera.GetViewMatrix();
+	glm::mat4 projectionMatrix = m_scene->GetCurrentCam()->GetProjectionMatrix(getWindowWidth(), (float)getWindowHeight());
+	glm::mat4 viewMatrix = m_scene->GetCurrentCam()->GetViewMatrix();
 
 	// update perspective based on screen size
 	//m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
@@ -390,7 +403,13 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 
 #pragma endregion
 
-	m_scene = new Scene(&m_camera, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
+	m_cameras.push_back(new Camera(glm::vec3(1,1,1)));
+	m_cameras.push_back(new Camera(glm::vec3(0,1,0)));
+	m_cameras.push_back(new Camera(glm::vec3(3,0,0)));
+	m_cameras.push_back(new Camera(glm::vec3(4,0,0)));
+
+
+	m_scene = new Scene(m_cameras, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
 
 	// Spear
 
@@ -599,20 +618,45 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::DragFloat3("Lucy pos", &m_lucyTransform[3][0], 0.1f, -20.f, 20.0f);*/
 	//ImGui::DragFloat3("Bunny pos", &m_scene->m_instances[2]->m_transform[3][0], 0.1f, -20.f, 20.0f);
 
-	ImGui::DragFloat3("Bunny pos", &m_scene->m_instances[2]->m_pos[0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Spear pos", &m_scene->m_instances[0]->m_pos[0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Sword pos", &m_scene->m_instances[1]->m_pos[0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Sword rot", &m_scene->m_instances[2]->m_rot[0], 0.1f, -180.f, 180.0f);
-	ImGui::DragFloat3("Sword scale", &m_scene->m_instances[2]->m_scale[0], 0.1f, 0.1f, 2.0f);
+	ImGui::DragFloat3("Bunny position", &m_scene->m_instances[2]->m_pos[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Bunny rotation", &m_scene->m_instances[2]->m_rot[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Bunny scale", &m_scene->m_instances[2]->m_scale[0], 0.1f, -20.f, 20.0f);
 
-	for(auto ins : m_scene->m_instances)
-	ins->RecalculateTransform();
+	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_pos[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_rot[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_scale[0], 0.1f, -20.f, 20.0f);
+
+
+	ImGui::DragFloat3("Sword position", &m_scene->m_instances[1]->m_pos[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Sword rotation", &m_scene->m_instances[1]->m_rot[0], 0.1f, -180.f, 180.0f);
+	ImGui::DragFloat3("Sword scale", &m_scene->m_instances[1]->m_scale[0], 0.1f, 0.1f, 2.0f);
+
+	for (auto ins : m_scene->m_instances)
+		ins->RecalculateTransform();
 
 	ImGui::End();
 
-	// Make the bunny translate
-	/*ImGui::Begin("Translate");
-	ImGui::DragFloat3("Bunny", &m_bunnyPosition[0], 0.1f, -20.f, 20.0f);
-	ImGui::End();*/
+	ImGui::Begin("Point Light Positions");
+	ImGui::DragFloat3("light 1 pos", &m_scene->GetPointLights()[0].m_direction[0], 0.1f, -50.f, 50.0f);
+	ImGui::DragFloat3("light 2 pos", &m_scene->GetPointLights()[1].m_direction[0], 0.1f, -50.f, 50.0f);
+	ImGui::End();
+
+	ImGui::Begin("Point Light Colours");
+	ImGui::DragFloat3("light 1 colour", &m_scene->GetPointLights()[0].m_colour[0], 0.1f, 0.0f, 2.0f);
+	ImGui::DragFloat3("light 2 colour", &m_scene->GetPointLights()[1].m_colour[0], 0.1f, 0.0f, 2.0f);
+	ImGui::End();
+
+	ImGui::Begin("Camera Positions");
+	ImGui::Text("Camera list");
+	ImGui::TextColored(ImVec4(0,1,0,1),("Current camera: " + std::to_string(m_scene->currentCam)).c_str());
+	for (int i = 0; i < m_scene->m_cameras.size(); i++)
+	{
+		if (ImGui::Button(("Select Camera" + std::to_string(i)).c_str(), ImVec2(100, 20)))
+		{
+			m_scene->currentCam = i;
+		}
+	}
+	ImGui::End();
+
 
 }

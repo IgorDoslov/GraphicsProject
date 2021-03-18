@@ -27,7 +27,7 @@ protected:
 	int m_currentCamera = 0;
 	
 	Camera m_camera;
-	std::vector<Camera> m_cameras;
+	std::vector<Camera*> m_cameras;
 
 	// camera transforms
 	glm::mat4	m_viewMatrix;
