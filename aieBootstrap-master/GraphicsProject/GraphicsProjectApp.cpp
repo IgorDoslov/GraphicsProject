@@ -48,6 +48,7 @@ bool GraphicsProjectApp::startup() {
 	light.m_colour = { 1, 1, 1 };
 	light.m_direction = { 1, -1, 1 };
 
+
 	m_cameras.push_back(Camera());
 	m_cameras.push_back(Camera());
 
@@ -80,7 +81,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 			i == 10 ? white : black);
 	}
 	float time = getTime();
-	Gizmos::addSphere(m_scene->GetLight().m_direction, 0.5f, 8, 8, glm::vec4(1));
+	Gizmos::addSphere(-5.0f * m_scene->GetLight().m_direction, 0.25f, 8, 8, glm::vec4(1));
 	//Gizmos::addSphere(vec3(0, 0, 0), 1, 16, 16, vec4(1, 1, 0, 1));
 	//Gizmos::addSphere(-vec3(glm::cos(time * 5.f), 0.f, glm::sin(time * 5.0f)), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
 	//Gizmos::addSphere(-vec3(glm::cos(time * 2.f), 0.f, glm::sin(time * 2.f)) + vec3(6.f), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
@@ -98,9 +99,9 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
 
-	m_camera.Update(deltaTime);
+	m_scene->GetCamera()->Update(deltaTime);
 	//m_cameras[m_currentCamera].Update(deltaTime);
-
+	//m_scene->Update(deltaTime);
 	IMGUI_Logic();
 
 	/*for (auto& l : m_lights)
@@ -116,7 +117,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 		(glm::sin(time * 2)),
 		0));
 
-		// quit if we press escape
+	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
 	if (input->wasKeyPressed(aie::INPUT_KEY_UP))
@@ -224,11 +225,11 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 
 #pragma region FlatBunny Logic
 	// Logic
-	/*if (m_bunnyMesh.load("./stanford/bunny.obj") == false)
+	if (m_bunnyMesh.load("./stanford/bunny.obj", true, true) == false)
 	{
 		printf("Bunny mesh Failed!\n");
 		return false;
-	}*/
+	}
 
 
 
@@ -391,14 +392,37 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 
 	m_scene = new Scene(&m_camera, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
 
-	for (int i = 0; i < 10; i++)
-	{
-		m_scene->AddInstance(new Instance(glm::vec3(i * 2, 0, 0), 
-			glm::vec3(0, i*30, 0), 
-			glm::vec3(1), 
-			&m_spearMesh, 
-			&m_normalMapShader));
-	}
+	// Spear
+
+	m_scene->AddInstance(new Instance(glm::vec3(2, 0, 0),
+		glm::vec3(0, 3, 0),
+		glm::vec3(1),
+		&m_spearMesh,
+		&m_normalMapShader));
+
+
+
+	// Sword
+	m_scene->AddInstance(new Instance(glm::vec3(0, 0, 5),
+		glm::vec3(0, 0, 0),
+		glm::vec3(0.01f),
+		&m_swordMesh,
+		&m_normalMapShader));
+
+
+	// Bunny
+	m_scene->AddInstance(new Instance(glm::vec3(0, 0, 0),
+		glm::vec3(0, 0, 0),
+		glm::vec3(0.2f),
+		&m_bunnyMesh,
+		&m_phongShader));
+
+
+	// Add a red light on the left side
+	m_scene->GetPointLights().push_back(Light(vec3(5, 3, 0), vec3(1, 0, 0), 50));
+	// Add a green light on the right side
+	m_scene->GetPointLights().push_back(Light(vec3(-5, 3, 0), vec3(0, 1, 0), 50));
+
 
 
 	return true;
@@ -569,17 +593,26 @@ void GraphicsProjectApp::IMGUI_Logic()
 
 	// These allow you to move the models around in the scene
 	ImGui::Begin("Object Positions");
-	ImGui::DragFloat3("Bunny pos", &m_bunnyTransform[3][0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Dragon pos", &m_dragonTransform[3][0], 0.1f, -20.f, 20.0f);
+
+	/*ImGui::DragFloat3("Dragon pos", &m_dragonTransform[3][0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Buddha pos", &m_buddhaTransform[3][0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Lucy pos", &m_lucyTransform[3][0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Spear pos", &m_spearTransform[3][0], 0.1f, -20.f, 20.0f);
-	ImGui::DragFloat3("Sword pos", &m_swordTransform[3][0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Lucy pos", &m_lucyTransform[3][0], 0.1f, -20.f, 20.0f);*/
+	//ImGui::DragFloat3("Bunny pos", &m_scene->m_instances[2]->m_transform[3][0], 0.1f, -20.f, 20.0f);
+
+	ImGui::DragFloat3("Bunny pos", &m_scene->m_instances[2]->m_pos[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Spear pos", &m_scene->m_instances[0]->m_pos[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Sword pos", &m_scene->m_instances[1]->m_pos[0], 0.1f, -20.f, 20.0f);
+	ImGui::DragFloat3("Sword rot", &m_scene->m_instances[2]->m_rot[0], 0.1f, -180.f, 180.0f);
+	ImGui::DragFloat3("Sword scale", &m_scene->m_instances[2]->m_scale[0], 0.1f, 0.1f, 2.0f);
+
+	for(auto ins : m_scene->m_instances)
+	ins->RecalculateTransform();
+
 	ImGui::End();
 
 	// Make the bunny translate
-	ImGui::Begin("Translate");
+	/*ImGui::Begin("Translate");
 	ImGui::DragFloat3("Bunny", &m_bunnyPosition[0], 0.1f, -20.f, 20.0f);
-	ImGui::End();
+	ImGui::End();*/
 
 }

@@ -7,6 +7,8 @@
 class Camera;
 class Instance;
 
+const int MAX_LIGHTS = 4;
+
 struct Light {
 
 	Light()
@@ -33,18 +35,31 @@ public:
 
 	void AddInstance(Instance* a_instance);
 	void Draw();
+	//void Update(float deltaTime);
 
-	Camera* GetCamera() { return m_camera; }
-	glm::vec2 GetWindowSize() { return m_windowSize; }
-	Light& GetLight() { return m_light; }
-	glm::vec3 GetAmbientLight() { return m_ambientLight; }
+	Camera* GetCamera()				{ return m_camera; }
+	glm::vec2 GetWindowSize()		 { return m_windowSize; }
+	Light& GetLight()				{ return m_light; }
+	glm::vec3 GetAmbientLight()		{ return m_ambientLight; }
 
+	int GetNumLights() { return (int)m_pointLights.size(); }
+	glm::vec3* GetPointLightPositions() { return &m_pointLightPositions[0]; }
+	glm::vec3* GetPointLightColours() { return &m_pointLightColours[0]; }
+
+	std::vector<Light>& GetPointLights() { return m_pointLights; }
+	std::vector<Instance*> GetInstances() { return m_instances; }
+	std::vector<Instance*>	m_instances;
 protected:
-	Camera* m_camera;
-	glm::vec2 m_windowSize;
-	Light m_light;
-	glm::vec3 m_ambientLight;
-	std::list<Instance*> m_instances;
+	Camera*					m_camera;
+	glm::vec2				m_windowSize;
+	Light					m_light;
+	Light					m_sunLight;
+	std::vector<Light>		m_pointLights;
 
+	glm::vec3				m_ambientLight;
+	
+
+	glm::vec3				m_pointLightPositions[MAX_LIGHTS];
+	glm::vec3				m_pointLightColours[MAX_LIGHTS];
 };
 
