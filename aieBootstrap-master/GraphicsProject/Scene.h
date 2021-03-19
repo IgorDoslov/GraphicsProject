@@ -43,6 +43,8 @@ public:
 	glm::vec2 GetWindowSize()		 { return m_windowSize; }
 	Light& GetLight()				{ return m_light; }
 	glm::vec3 GetAmbientLight()		{ return m_ambientLight; }
+	glm::vec3 SetAmbientLight(glm::vec3 a_amibientLight) { return m_ambientLight = a_amibientLight; }
+
 
 	int GetNumLights() { return (int)m_pointLights.size(); }
 	glm::vec3* GetPointLightPositions() { return &m_pointLightPositions[0]; }

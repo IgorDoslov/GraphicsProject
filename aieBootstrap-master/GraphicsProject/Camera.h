@@ -4,7 +4,7 @@
 class Camera
 {
 public:
-	Camera(glm::vec3 a_camPos = glm::vec3(0));
+	Camera(bool a_isStatic, glm::vec3 a_camPos = glm::vec3(0));
 	~Camera() {};
 
 	void Update(float a_deltaTime);
@@ -15,6 +15,7 @@ public:
 
 	glm::mat4 GetProjectionMatrix(float a_width, float a_height);
 
+	bool m_isStatic = true;
 private:
 	float m_theta; // In degrees
 	float m_phi; // In degress

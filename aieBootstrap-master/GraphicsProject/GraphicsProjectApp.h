@@ -97,6 +97,14 @@ protected:
 	glm::mat4 m_kneeBone;
 	glm::mat4 m_ankleBone;
 
+	KeyFrame m_hipFrames2[2];
+	KeyFrame m_kneeFrames2[2];
+	KeyFrame m_ankleFrames2[2];
+
+	glm::mat4 m_hipBone2;
+	glm::mat4 m_kneeBone2;
+	glm::mat4 m_ankleBone2;
+
 	/*glm::vec3 m_positions[2];
 	glm::quat m_rotations[2];*/
 	/*struct Light {
@@ -107,7 +115,7 @@ protected:
 	};*/
 
 	//Light m_light;
-	//glm::vec3 m_ambientLight;
+	glm::vec3 m_ambLight = glm::vec3(0.25f);
 	
 	glm::vec3 sunlightMov = { 0.0f, 0.0f, 0.0f };
 	float sunLightOrbit = 0.0f;
@@ -122,4 +130,10 @@ public:
 	bool LoadShaderAndMeshLogic(Light a_light);
 	// void DrawShaderAndMeshes(glm::mat4, glm::mat4);
 	void IMGUI_Logic();
+
+	void LegPosRot(int frameNum, KeyFrame* hipFrame, KeyFrame* kneeFrame, KeyFrame* ankleFrame, 
+		glm::vec3 hipPos, glm::quat hipRot, glm::vec3 kneePos, glm::quat kneeRot, glm::vec3 anklePos, glm::quat ankleRot);
+	
+	
+	
 };
