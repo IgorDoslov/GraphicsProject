@@ -9,6 +9,13 @@ Camera::Camera(bool a_isStatic, glm::vec3 a_camPos)
 	m_theta = 0;
 	m_isStatic = a_isStatic;
 }
+Camera::Camera(glm::vec3 a_camPos)
+{
+	m_position = a_camPos;
+	m_phi = 0;
+	m_theta = 0;
+	
+}
 
 void Camera::Update(float a_deltaTime)
 {
@@ -71,7 +78,7 @@ glm::mat4 Camera::GetViewMatrix()
 	float phiR = glm::radians(m_phi);
 	glm::vec3 forward(glm::cos(phiR) * glm::cos(thetaR), glm::sin(phiR), glm::cos(phiR) * glm::sin(thetaR));
 
-	// If static camera == true
+	// If static camera move otherwise look at the centre
 	if (m_isStatic == false)
 		return glm::lookAt(m_position, m_position + forward, glm::vec3(0, 1, 0));
 	else
