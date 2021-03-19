@@ -64,7 +64,7 @@ N = TBN * (texNormal * 2 - 1);
 vec3 diffuseTotal = diffuse(L, LightColour, N);
 
 // Now we can calculate the lambert term, negative the light direction
-float lambertTerm = max(0, min(1,dot(N, -L)));
+//float lambertTerm = max(0, min(1,dot(N, -L)));
 
 // Calculate the view vector and the reflection vector
 vec3 V = normalize(CameraPosition - vPosition.xyz);

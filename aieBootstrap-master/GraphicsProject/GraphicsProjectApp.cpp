@@ -38,10 +38,10 @@ bool GraphicsProjectApp::startup() {
 	Gizmos::create(10000, 10000, 10000, 10000);
 
 	// create simple camera transforms
-	m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
+	//m_viewMatrix = glm::lookAt(vec3(10), vec3(0), vec3(0, 1, 0));
 	//m_viewMatrix = glm::lookAt(m_camPosition, vec3(0), vec3(0, 1, 0));
 
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
+	//m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f, getWindowWidth() / (float)getWindowHeight(), 0.1f, 1000.0f);
 
 	//m_light.colour = { 1, 1, 1 };
 	//m_ambientLight = { 0.5f, 0.5f, 0.5f };
@@ -74,8 +74,6 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
-
-
 	// draw a simple grid with gizmos
 	vec4 white(1);
 	vec4 black(0, 0, 0, 1);
@@ -88,25 +86,28 @@ void GraphicsProjectApp::update(float deltaTime) {
 			i == 10 ? white : black);
 	}
 	float time = getTime();
-	Gizmos::addSphere(-5.0f * m_scene->GetLight().m_direction, 0.25f, 8, 8, glm::vec4(m_scene->GetLight().m_colour, 1));
-	//Gizmos::addSphere(m_scene->GetPointLightPositions()[0], 0.25f, 8, 8, glm::vec4(1,0,0,1));
+	// Sunlight
+	Gizmos::addSphere(-sunLightOrbit * m_scene->GetLight().m_direction + sunlightMov, 0.25f, 8, 8, glm::vec4(m_scene->GetLight().m_colour, 1));
+	// Light red
 	Gizmos::addSphere(m_scene->GetPointLightPositions()[0], 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[0].m_colour, 1));
-	Gizmos::addSphere(m_scene->GetPointLightPositions()[1], 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[1].m_colour, 1));
+	// Light 2
+	Gizmos::addSphere(m_scene->GetPointLights()[1].m_direction, 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[1].m_colour, 1));
+	
 
-
+	m_scene->GetLight().m_direction = glm::normalize(glm::vec3(glm::cos(time * sunLightOrbitSpeed), (glm::sin(time * sunLightOrbitSpeed)), 0));
 
 	//Gizmos::addSphere(vec3(0, 0, 0), 1, 16, 16, vec4(1, 1, 0, 1));
 	//Gizmos::addSphere(-vec3(glm::cos(time * 5.f), 0.f, glm::sin(time * 5.0f)), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
-	//Gizmos::addSphere(-vec3(glm::cos(time * 2.f), 0.f, glm::sin(time * 2.f)) + vec3(6.f), 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
+	//Gizmos::addSphere(vec3(glm::cos(time * 2.f), 0.f, glm::sin(time * 2.f)) + planetMov, 0.1f, 8.f, 8.f, vec4(1.f, 0.f, 0.f, 1.f));
 	//Gizmos::addSphere(-vec3(0.f, 0.f, 0.f), 1.f, 16.f, 16.f, vec4(1.f, 1.f, 0.f, 1.f));
 
-	static float angle = 0;
+	/*static float angle = 0;
 	angle += deltaTime;
 	m_camPosition.x = 10.f * sin(angle);
-	m_camPosition.z = 10.f * cos(angle);
+	m_camPosition.z = 10.f * cos(angle);*/
 	//m_viewMatrix = glm::lookAt(m_camPosition, vec3(0), vec3(0, 1, 0));
 
-	m_bunnyTransform = glm::translate(m_bunnyTransform, m_bunnyPosition);
+	//m_bunnyTransform = glm::translate(m_bunnyTransform, m_bunnyPosition);
 
 
 	// add a transform so that we can see the axis
@@ -121,9 +122,6 @@ void GraphicsProjectApp::update(float deltaTime) {
 
 
 
-	m_scene->GetLight().m_direction = glm::normalize(glm::vec3(glm::cos(time * 2),
-		(glm::sin(time * 2)),
-		0));
 
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
@@ -206,135 +204,6 @@ void GraphicsProjectApp::draw() {
 
 bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 {
-#pragma region Quad
-
-	// Load the vertex shader from a file
-	m_simpleShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
-
-	// Load the fragment shader from a file
-	m_simpleShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
-	if (!m_simpleShader.link())
-	{
-		printf("Simple Shader had an error: %s\n", m_simpleShader.getLastError());
-		return false;
-	}
-
-
-	Mesh::Vertex vertices[4];
-	vertices[0].position = { -0.5f, 0.f, 0.5f, 1.f };
-	vertices[1].position = { 0.5f, 0.f, 0.5f, 1.f };
-	vertices[2].position = { -0.5f, 0.f, -0.5f, 1.f };
-	vertices[3].position = { 0.5f, 0.f, -0.5f, 1.f };
-
-	unsigned int indices[6] = { 0,1,2,2,1,3 };
-
-	//m_quadMesh.Initialise(4, vertices, 6, indices);
-	m_quadMesh.InitialiseQuad();
-	// We will make the quad 10 units by 10 units
-	m_quadTransform = {
-	10, 0, 0, 0,
-	0, 10, 0, 0,
-	0, 0, 10, 0,
-	0, 0, 0, 1
-	};
-	float shadowLength = glm::sqrt(m_camPosition.x * m_camPosition.x + m_camPosition.z * m_camPosition.z);
-	float angle = atan(shadowLength / m_camPosition.y);
-	//m_quadTransform = glm::rotate(m_quadTransform, atan(1.41f), glm::vec3(10,0,-10));
-	m_quadTransform = glm::rotate(m_quadTransform, angle, glm::vec3(m_camPosition.z, 0, m_camPosition.x));
-#pragma endregion
-
-#pragma region FlatBunny Shader
-	// Load the vertex shader from a file
-	m_bunnyShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/simple.vert");
-
-	// Load the fragment shader from a file
-	m_bunnyShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/simple.frag");
-	if (!m_bunnyShader.link())
-	{
-		printf("Bunny Shader had an error: %s\n", m_bunnyShader.getLastError());
-		return false;
-	}
-
-
-#pragma endregion
-
-#pragma region FlatBunny Logic
-	// Logic
-	if (m_bunnyMesh.load("./stanford/bunny.obj", true, true) == false)
-	{
-		printf("Bunny mesh Failed!\n");
-		return false;
-	}
-
-
-
-	m_bunnyTransform = {
-	0.5f, 0,0,0,
-	0,0.5f,0,0,
-	0,0,0.5f,0,
-	0,0,0,1 };
-
-	//m_bunnyTransform = glm::translate(m_bunnyTransform, glm::vec3(20,0,30));
-#pragma endregion
-
-#pragma region Dragon Logic
-	// Logic
-	/*if (m_dragonMesh.load("./stanford/dragon.obj") == false)
-	{
-		printf("Dragon mesh Failed!\n");
-		return false;
-	}*/
-
-
-
-	m_dragonTransform = {
-	0.5f, 0,0,0,
-	0,0.5f,0,0,
-	0,0,0.5f,0,
-	0,0,0,1 };
-
-	m_dragonTransform = glm::translate(m_dragonTransform, glm::vec3(1, 0, 1) * 10.f);
-#pragma endregion
-
-#pragma region Buddha Logic
-	// Logic
-	/*if (m_buddhaMesh.load("./stanford/buddha.obj") == false)
-	{
-		printf("Buddha mesh Failed!\n");
-		return false;
-	}*/
-
-
-
-	m_buddhaTransform = {
-	0.5f, 0,0,0,
-	0,0.5f,0,0,
-	0,0,0.5f,0,
-	0,0,0,1 };
-
-	m_buddhaTransform = glm::translate(m_buddhaTransform, glm::vec3(0, 0, 1) * 5.f);
-#pragma endregion
-
-#pragma region Lucy Logic
-	// Logic
-	/*if (m_lucyMesh.load("./stanford/lucy.obj") == false)
-	{
-		printf("Lucy mesh Failed!\n");
-		return false;
-	}*/
-
-
-
-	m_lucyTransform = {
-	0.5f, 0,0,0,
-	0,0.5f,0,0,
-	0,0,0.5f,0,
-	0,0,0,1 };
-
-
-#pragma endregion
-
-
 
 #pragma region Phong Load
 	m_phongShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/phong.vert");
@@ -348,17 +217,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 
 #pragma endregion
 
-#pragma region Texture Shader
-	m_textureShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/textured.vert");
-	m_textureShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/textured.frag");
 
-	if (m_textureShader.link() == false)
-	{
-		printf("Textured Shader had an error: %s\n", m_textureShader.getLastError());
-		return false;
-	}
-
-#pragma endregion
 
 #pragma region NormalMapShader
 	m_normalMapShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/normalMap.vert");
@@ -372,26 +231,6 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 #pragma endregion
 
 
-#pragma region MultiLights
-	m_normalMapMultiLights.loadShader(aie::eShaderStage::VERTEX, "./shaders/normalMapMultiLights.vert");
-	m_normalMapMultiLights.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/normalMapMultiLights.frag");
-
-	if (m_normalMapMultiLights.link() == false)
-	{
-		printf("Normal Map Multi Shader had an error: %s\n", m_normalMapMultiLights.getLastError());
-		return false;
-	}
-#pragma endregion
-
-
-#pragma region Grid Logic
-	if (m_gridTexture.load("./textures/numbered_grid.tga") == false)
-	{
-		printf("Failed to load: numbered_grid.tga\n");
-		return false;
-	}
-#pragma endregion
-
 
 #pragma region Soulspear
 	// Load spear obj file
@@ -400,12 +239,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 		printf("Soulspear Mesh has had an error!\n");
 		return false;
 	}
-	// Spear position
-	m_spearTransform = {
-	1.f, 0, 0, 0,
-	0, 1.f, 0, 0,
-	0, 0, 1.f, 0,
-	0, 0, 0, 1 };
+	
 
 #pragma endregion
 
@@ -416,14 +250,24 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 		printf("sword Mesh has had an error!\n");
 		return false;
 	}
-	// Sword position
-	m_swordTransform = {
-	0.01f, 0, 0, 0,
-	0, 0.01f, 0, 0,
-	0, 0, 0.01f, 0,
-	0, 0, 0, 1 };
+	
 
 #pragma endregion
+
+
+
+#pragma region FlatBunny Logic
+	// Logic
+	if (m_bunnyMesh.load("./stanford/bunny.obj", true, true) == false)
+	{
+		printf("Bunny mesh Failed!\n");
+		return false;
+	}
+
+#pragma endregion
+
+
+
 
 	// Creating the four cameras for the scene
 	m_cameras.push_back(new Camera(glm::vec3(1, 1, 1)));
@@ -630,6 +474,10 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::Begin("Scene Light Settings");
 	ImGui::DragFloat3("Sunlight Direction", &m_scene->GetLight().m_direction[0], 0.1f, -1.f, 1.f);
 	ImGui::DragFloat3("Sunlight Colour", &m_scene->GetLight().m_colour[0], 0.1f, 0.f, 2.0f);
+	ImGui::DragFloat3("Sunlight position", &sunlightMov[0], 0.1f, -50.f, 50.0f);
+	ImGui::DragFloat("Sunlight orbit", &sunLightOrbit, 0.1f, -50.f, 50.0f);
+	ImGui::DragFloat("Sunlight orbit speed", &sunLightOrbitSpeed, 0.1f, -50.f, 50.0f);
+	
 	ImGui::DragFloat3("light 1 position", &m_scene->GetPointLights()[0].m_direction[0], 0.1f, -50.f, 50.0f);
 	ImGui::DragFloat3("light 1 colour", &m_scene->GetPointLights()[0].m_colour[0], 0.1f, 0.0f, 2.0f);
 	ImGui::DragFloat3("light 2 position", &m_scene->GetPointLights()[1].m_direction[0], 0.1f, -50.f, 50.0f);

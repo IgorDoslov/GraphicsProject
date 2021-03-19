@@ -108,6 +108,11 @@ protected:
 
 	//Light m_light;
 	//glm::vec3 m_ambientLight;
+	
+	glm::vec3 sunlightMov = { 0.0f, 0.0f, 0.0f };
+	float sunLightOrbit = 0.0f;
+	float sunLightOrbitSpeed = 1.0f;
+
 
 
 	//std::vector<Light> m_lights;
