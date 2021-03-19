@@ -170,12 +170,14 @@ void GraphicsProjectApp::draw() {
 
 	m_scene->Draw();
 
-
+	// Draw each leg
 	DrawLeg(m_hipBone, m_kneeBone, m_ankleBone, glm::vec4(1,0,0,1));
 	DrawLeg(m_hipBone2, m_kneeBone2, m_ankleBone2, glm::vec4(0,1,0,1));
 	DrawLeg(m_hipBone3, m_kneeBone3, m_ankleBone3, glm::vec4(0,0,1,1));
 	DrawLeg(m_hipBone4, m_kneeBone4, m_ankleBone4, glm::vec4(1,1,1,1));
 
+	// Body
+	Gizmos::addAABBFilled(glm::vec3(5,15,5), glm::vec4(5.0f), glm::vec4(1, 0, 1, 1));
 
 
 	Gizmos::draw(projectionMatrix * viewMatrix);
@@ -406,7 +408,7 @@ void GraphicsProjectApp::DrawLeg(glm::mat4 hipBone, glm::mat4 kneeBone, glm::mat
 		ankleBone[3].z);
 
 	glm::vec4 half(0.5f);
-	glm::vec4 pink(1, 0, 1, 1);
+	//glm::vec4 pink(1, 0, 1, 1);
 
 	Gizmos::addAABBFilled(hipPos, half, legColor, &hipBone);
 	Gizmos::addAABBFilled(kneePos, half, legColor, &kneeBone);
