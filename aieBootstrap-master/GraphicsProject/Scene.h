@@ -30,19 +30,17 @@ class Scene
 {
 public:
 
-	//Scene(Camera* a_camera, glm::vec2 a_windowSize, Light& a_light, glm::vec3 a_ambientLight);
 	Scene(std::vector<Camera*> a_cameras, glm::vec2 a_windowSize, Light& a_light, glm::vec3 a_ambientLight);
 	~Scene();
 
 	void AddInstance(Instance* a_instance);
 	void Draw();
-	//void Update(float deltaTime);
 	int currentCam = 0;
-	Camera* GetCamera()				{ return m_camera; }
+	Camera* GetCamera() { return m_camera; }
 	Camera* GetCurrentCam() { return m_cameras[currentCam]; }
-	glm::vec2 GetWindowSize()		 { return m_windowSize; }
-	Light& GetLight()				{ return m_light; }
-	glm::vec3 GetAmbientLight()		{ return m_ambientLight; }
+	glm::vec2 GetWindowSize() { return m_windowSize; }
+	Light& GetLight() { return m_light; }
+	glm::vec3 GetAmbientLight() { return m_ambientLight; }
 	glm::vec3 SetAmbientLight(glm::vec3 a_amibientLight) { return m_ambientLight = a_amibientLight; }
 
 
@@ -56,14 +54,14 @@ public:
 
 	std::vector<Camera*>		m_cameras;
 protected:
-	Camera*					m_camera;
+	Camera* m_camera;
 	glm::vec2				m_windowSize;
 	Light					m_light;
 	Light					m_sunLight;
 	std::vector<Light>		m_pointLights;
 
 	glm::vec3				m_ambientLight;
-	
+
 
 	glm::vec3				m_pointLightPositions[MAX_LIGHTS];
 	glm::vec3				m_pointLightColours[MAX_LIGHTS];

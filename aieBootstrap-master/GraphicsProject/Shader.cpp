@@ -125,7 +125,7 @@ bool ShaderProgram::link() {
 
 	for (auto& s : m_shaders)
 	{
-		printf("%x", s.get());
+		
 		if (s != nullptr && s.get() != nullptr)
 			glAttachShader(m_program, s->getHandle());
 	}

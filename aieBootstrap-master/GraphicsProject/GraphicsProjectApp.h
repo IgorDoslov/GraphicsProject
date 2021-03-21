@@ -35,8 +35,6 @@ public:
 
 protected:
 
-	int m_currentCamera = 0;
-
 	Camera m_camera;
 	std::vector<Camera*> m_cameras;
 
@@ -44,40 +42,14 @@ protected:
 	glm::mat4	m_viewMatrix;
 	glm::mat4	m_projectionMatrix;
 
-	aie::Texture m_gridTexture;
-
 	// === SHADER ===
-	aie::ShaderProgram m_simpleShader;
-	aie::ShaderProgram m_bunnyShader;
 	aie::ShaderProgram m_phongShader;
-	aie::ShaderProgram m_textureShader;
 	aie::ShaderProgram m_normalMapShader;
-	aie::ShaderProgram m_normalMapMultiLights;
-
 
 	// ==============
-	// Basic plane
-	Mesh m_quadMesh;
-	glm::mat4 m_quadTransform;
-
-
 	// Create a bunny with a flat colour
 	aie::OBJMesh m_bunnyMesh;
 	glm::mat4 m_bunnyTransform;
-	glm::vec3 m_bunnyPosition = { 0,0,0 };
-
-	// Create a dragon with a flat colour
-	aie::OBJMesh m_dragonMesh;
-	glm::mat4 m_dragonTransform;
-
-
-	// Create a Buddha with a flat colour
-	aie::OBJMesh m_buddhaMesh;
-	glm::mat4 m_buddhaTransform;
-
-	// Create a Lucy with a flat colour
-	aie::OBJMesh m_lucyMesh;
-	glm::mat4 m_lucyTransform;
 
 	// Create a Soulspear
 	aie::OBJMesh m_spearMesh;
@@ -125,28 +97,24 @@ protected:
 	glm::mat4 m_kneeBone4;
 	glm::mat4 m_ankleBone4;
 
-	
+
 	glm::vec3 m_ambLight = glm::vec3(0.25f);
-	
+
 	glm::vec3 sunlightMov = { 0.0f, 0.0f, 0.0f };
-	float sunLightOrbit = 0.0f;
-	float sunLightOrbitSpeed = 1.0f;
+	float sunLightOrbit = 2.0f;
+	float sunLightOrbitSpeed = 2.0f;
 
-
-
-	//std::vector<Light> m_lights;
-	glm::vec3 m_camPosition = glm::vec3(15);
 
 public:
 	bool LoadShaderAndMeshLogic(Light a_light);
-	// void DrawShaderAndMeshes(glm::mat4, glm::mat4);
+
 	void IMGUI_Logic();
 
-	void LegPosRot(int frameNum, KeyFrame* hipFrame, KeyFrame* kneeFrame, KeyFrame* ankleFrame, 
+	void LegPosRot(int frameNum, KeyFrame* hipFrame, KeyFrame* kneeFrame, KeyFrame* ankleFrame,
 		glm::vec3 hipPos, glm::quat hipRot, glm::vec3 kneePos, glm::quat kneeRot, glm::vec3 anklePos, glm::quat ankleRot);
 
 	void AnimateLeg(KeyFrame* hipFrames, KeyFrame* kneeFrames, KeyFrame* ankleFrames, glm::mat4& hipBone, glm::mat4& kneeBone, glm::mat4& ankleBone);
 
 	void DrawLeg(glm::mat4 hipBone, glm::mat4 kneeBone, glm::mat4 ankleBone, glm::vec4 legColor);
-	
+
 };

@@ -4,7 +4,8 @@
 
 
 Scene::Scene(std::vector<Camera*> a_cameras, glm::vec2 a_windowSize, Light& a_light, glm::vec3 a_ambientLight)
-	: m_cameras(a_cameras), m_windowSize(a_windowSize), m_light(a_light), m_ambientLight(a_ambientLight)
+	: m_cameras(a_cameras), m_windowSize(a_windowSize), m_light(a_light), m_ambientLight(a_ambientLight),
+	m_camera(), m_pointLightColours(), m_pointLightPositions()
 {
 
 }

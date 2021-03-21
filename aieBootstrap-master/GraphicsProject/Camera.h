@@ -23,6 +23,7 @@ private:
 	float m_phi; // In degress
 	glm::vec3 m_position;
 	float m_speed = 10.f;
-	float m_lastMouseX, m_lastMouseY;
+	float m_lastMouseX = 0.0f;
+	float m_lastMouseY = 0.0f;
 };
 

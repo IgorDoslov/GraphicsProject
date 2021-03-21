@@ -16,7 +16,7 @@ Instance::Instance(glm::mat4 a_transform, aie::OBJMesh* a_mesh, aie::ShaderProgr
 }
 
 Instance::Instance(glm::vec3 a_position, glm::vec3 a_eulerAngles, glm::vec3 a_scale, aie::OBJMesh* a_mesh, aie::ShaderProgram* a_shader)
-	: m_mesh(a_mesh), m_shader(a_shader)
+	: m_mesh(a_mesh), m_shader(a_shader), m_transform()
 {
 	m_pos = a_position;
 	m_rot = a_eulerAngles;

@@ -9,7 +9,7 @@ Camera::Camera(bool a_isStatic, glm::vec3 a_camPos)
 	m_theta = 0;
 	m_isStatic = a_isStatic;
 }
-Camera::Camera(glm::vec3 a_camPos)
+Camera::Camera(glm::vec3 a_camPos) : m_lastMouseX(), m_lastMouseY()
 {
 	m_position = a_camPos;
 	m_phi = 0;
@@ -28,36 +28,37 @@ void Camera::Update(float a_deltaTime)
 	glm::vec3 up(0, 1, 0);
 
 #pragma region Input Movement
-	if (input->isKeyDown(aie::INPUT_KEY_X))
+
+	// move camera up
+	if (input->isKeyDown(aie::INPUT_KEY_Q))
 		m_position += up * a_deltaTime * m_speed;
 
-	if (input->isKeyDown(aie::INPUT_KEY_Z))
+	// move camera down
+	if (input->isKeyDown(aie::INPUT_KEY_E))
 		m_position -= up * a_deltaTime * m_speed;
 
-
+	// move camera left
 	if (input->isKeyDown(aie::INPUT_KEY_A))
 		m_position -= right * a_deltaTime * m_speed;
 
-
+	// move camer right
 	if (input->isKeyDown(aie::INPUT_KEY_D))
 		m_position += right * a_deltaTime * m_speed;
 
-
+	// move camera forward
 	if (input->isKeyDown(aie::INPUT_KEY_W))
 		m_position += forward * a_deltaTime * m_speed;
 
-
+	// move camera back
 	if (input->isKeyDown(aie::INPUT_KEY_S))
 		m_position -= forward * a_deltaTime * m_speed;
-
-
 
 #pragma endregion
 
 	// Get the current position of the mouse coordinates
-	float mX = input->getMouseX();
-	float mY = input->getMouseY();
-	const float turnSpeed = glm::radians(180.f) * 4.f;
+	float mX = (float)input->getMouseX();
+	float mY = (float)input->getMouseY();
+	constexpr float turnSpeed = glm::radians(180.f) * 4.f;
 
 	// If the right button is down, increment the theta and phi
 	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_RIGHT))
@@ -78,7 +79,7 @@ glm::mat4 Camera::GetViewMatrix()
 	float phiR = glm::radians(m_phi);
 	glm::vec3 forward(glm::cos(phiR) * glm::cos(thetaR), glm::sin(phiR), glm::cos(phiR) * glm::sin(thetaR));
 
-	// If static camera move otherwise look at the centre
+	// If static camera == false then move, otherwise look at the centre
 	if (m_isStatic == false)
 		return glm::lookAt(m_position, m_position + forward, glm::vec3(0, 1, 0));
 	else

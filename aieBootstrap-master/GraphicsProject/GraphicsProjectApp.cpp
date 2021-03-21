@@ -19,7 +19,11 @@ using glm::mat4;
 using aie::Gizmos;
 
 
-GraphicsProjectApp::GraphicsProjectApp() //: m_ambientLight(), m_bunnyTransform(), m_buddhaTransform(), m_dragonTransform(), m_lucyTransform(), m_light(), m_projectionMatrix(), m_quadTransform(), m_viewMatrix()
+GraphicsProjectApp::GraphicsProjectApp() : m_bunnyTransform(), m_projectionMatrix(), m_viewMatrix(),
+m_hipFrames(), m_kneeFrames(), m_ankleFrames(), m_hipBone(), m_kneeBone(), m_ankleBone(), m_hipFrames2(),
+m_kneeFrames2(), m_ankleFrames2(), m_hipBone2(), m_kneeBone2(), m_ankleBone2(), m_hipFrames3(), m_kneeFrames3(),
+m_ankleFrames3(), m_hipBone3(), m_kneeBone3(), m_ankleBone3(), m_hipFrames4(), m_kneeFrames4(), m_ankleFrames4(),
+m_hipBone4(), m_kneeBone4(), m_ankleBone4(), m_spearTransform(), m_swordTransform(), m_scene()
 {
 
 
@@ -37,7 +41,7 @@ bool GraphicsProjectApp::startup() {
 	// initialise gizmo primitive counts
 	Gizmos::create(10000, 10000, 10000, 10000);
 
-
+	// sun light default settings
 	Light light;
 	light.m_colour = { 1, 1, 1 };
 	light.m_direction = { 1, -1, 1 };
@@ -48,6 +52,7 @@ bool GraphicsProjectApp::startup() {
 		glm::vec3(0, 5, 0), glm::vec3(1, 0, 0), // hip
 		glm::vec3(0, -2.5f, 0), glm::vec3(1, 0, 0), // knee
 		glm::vec3(0, -2.5f, 0), glm::vec3(-1, 0, 0)); // ankle
+
 	// End
 	LegPosRot(1, m_hipFrames, m_kneeFrames, m_ankleFrames,
 		glm::vec3(0, 5, 0), glm::vec3(-1, 0, 0), // hip
@@ -123,7 +128,7 @@ void GraphicsProjectApp::update(float deltaTime) {
 	// Light 2
 	Gizmos::addSphere(m_scene->GetPointLights()[1].m_direction, 0.25f, 8, 8, glm::vec4(m_scene->GetPointLights()[1].m_colour, 1));
 
-
+	// sunlight rotation
 	m_scene->GetLight().m_direction = glm::normalize(glm::vec3(glm::cos(time * sunLightOrbitSpeed), (glm::sin(time * sunLightOrbitSpeed)), 0));
 
 
@@ -144,14 +149,18 @@ void GraphicsProjectApp::update(float deltaTime) {
 	aie::Input* input = aie::Input::getInstance();
 
 
-
+	// Animate the legs
+	// Leg 1
 	AnimateLeg(m_hipFrames, m_kneeFrames, m_ankleFrames, m_hipBone, m_kneeBone, m_ankleBone);
+	// Leg 2
 	AnimateLeg(m_hipFrames2, m_kneeFrames2, m_ankleFrames2, m_hipBone2, m_kneeBone2, m_ankleBone2);
+	// Leg 3
 	AnimateLeg(m_hipFrames3, m_kneeFrames3, m_ankleFrames3, m_hipBone3, m_kneeBone3, m_ankleBone3);
+	// Leg 4
 	AnimateLeg(m_hipFrames4, m_kneeFrames4, m_ankleFrames4, m_hipBone4, m_kneeBone4, m_ankleBone4);
 
 
-	
+
 
 
 
@@ -171,13 +180,17 @@ void GraphicsProjectApp::draw() {
 	m_scene->Draw();
 
 	// Draw each leg
-	DrawLeg(m_hipBone, m_kneeBone, m_ankleBone, glm::vec4(1,0,0,1));
-	DrawLeg(m_hipBone2, m_kneeBone2, m_ankleBone2, glm::vec4(0,1,0,1));
-	DrawLeg(m_hipBone3, m_kneeBone3, m_ankleBone3, glm::vec4(0,0,1,1));
-	DrawLeg(m_hipBone4, m_kneeBone4, m_ankleBone4, glm::vec4(1,1,1,1));
+	// Leg 1
+	DrawLeg(m_hipBone, m_kneeBone, m_ankleBone, glm::vec4(1, 0, 0, 1));
+	// Leg 2
+	DrawLeg(m_hipBone2, m_kneeBone2, m_ankleBone2, glm::vec4(0, 1, 0, 1));
+	// Leg 3
+	DrawLeg(m_hipBone3, m_kneeBone3, m_ankleBone3, glm::vec4(0, 0, 1, 1));
+	// Leg 4
+	DrawLeg(m_hipBone4, m_kneeBone4, m_ankleBone4, glm::vec4(1, 1, 1, 1));
 
 	// Body
-	Gizmos::addAABBFilled(glm::vec3(5,15,5), glm::vec4(5.0f), glm::vec4(1, 0, 1, 1));
+	Gizmos::addAABBFilled(glm::vec3(5, 15, 5), glm::vec4(5.0f), glm::vec4(1, 0, 1, 1));
 
 
 	Gizmos::draw(projectionMatrix * viewMatrix);
@@ -185,7 +198,7 @@ void GraphicsProjectApp::draw() {
 
 bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 {
-
+	// Load Phong shader
 #pragma region Phong Load
 	m_phongShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/phong.vert");
 	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/phong.frag");
@@ -199,7 +212,7 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 #pragma endregion
 
 
-
+	// Load Normal shader
 #pragma region NormalMapShader
 	m_normalMapShader.loadShader(aie::eShaderStage::VERTEX, "./shaders/normalMap.vert");
 	m_normalMapShader.loadShader(aie::eShaderStage::FRAGMENT, "./shaders/normalMap.frag");
@@ -236,9 +249,9 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 #pragma endregion
 
 
-
+	// Load the bunny mesh
 #pragma region FlatBunny Logic
-	// Logic
+
 	if (m_bunnyMesh.load("./stanford/bunny.obj", true, true) == false)
 	{
 		printf("Bunny mesh Failed!\n");
@@ -254,24 +267,24 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 	m_cameras.push_back(new Camera(true, glm::vec3(0, 10, 0)));
 	m_cameras.push_back(new Camera(true, glm::vec3(0, 0, 10)));
 
-
+	// create the scene
 	m_scene = new Scene(m_cameras, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
 
-	// Spear
+	// Add instance of a Spear
 	m_scene->AddInstance(new Instance(glm::vec3(2, 0, 0),
 		glm::vec3(0, 3, 0),
 		glm::vec3(1),
 		&m_spearMesh,
 		&m_normalMapShader));
 
-	// Sword
+	// Add instance of a Sword
 	m_scene->AddInstance(new Instance(glm::vec3(0, 0, 5),
 		glm::vec3(0, 0, 0),
 		glm::vec3(0.01f),
 		&m_swordMesh,
 		&m_normalMapShader));
 
-	// Bunny
+	// load instance of a Bunny
 	m_scene->AddInstance(new Instance(glm::vec3(0, 0, 0),
 		glm::vec3(0, 0, 0),
 		glm::vec3(0.2f),
@@ -292,14 +305,15 @@ void GraphicsProjectApp::IMGUI_Logic()
 {
 	// Change light direction and colour in the scene
 	ImGui::Begin("Scene Light Settings");
+	// Sunlight
 	ImGui::DragFloat3("Sunlight Direction", &m_scene->GetLight().m_direction[0], 0.1f, -1.f, 1.f);
 	ImGui::DragFloat3("Sunlight Colour", &m_scene->GetLight().m_colour[0], 0.1f, 0.f, 2.0f);
-	ImGui::DragFloat3("Ambient Colour", &m_ambLight[0], 0.1f, 0.f, 3.0f);
-
 	ImGui::DragFloat3("Sunlight position", &sunlightMov[0], 0.1f, -50.f, 50.0f);
 	ImGui::DragFloat("Sunlight orbit", &sunLightOrbit, 0.1f, -50.f, 50.0f);
 	ImGui::DragFloat("Sunlight orbit speed", &sunLightOrbitSpeed, 0.1f, -50.f, 50.0f);
-
+	// Ambient light
+	ImGui::DragFloat3("Ambient Colour", &m_ambLight[0], 0.1f, 0.f, 3.0f);
+	// Point lights
 	ImGui::DragFloat3("light 1 position", &m_scene->GetPointLights()[0].m_direction[0], 0.1f, -50.f, 50.0f);
 	ImGui::DragFloat3("light 1 colour", &m_scene->GetPointLights()[0].m_colour[0], 0.1f, 0.0f, 2.0f);
 	ImGui::DragFloat3("light 2 position", &m_scene->GetPointLights()[1].m_direction[0], 0.1f, -50.f, 50.0f);
@@ -308,19 +322,19 @@ void GraphicsProjectApp::IMGUI_Logic()
 
 	// These allow you to move the models around in the scene
 	ImGui::Begin("Object Positions");
-
+	// Bunny 
 	ImGui::DragFloat3("Bunny position", &m_scene->m_instances[2]->m_pos[0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Bunny rotation", &m_scene->m_instances[2]->m_rot[0], 0.1f, -180.f, 180.0f);
 	ImGui::DragFloat3("Bunny scale", &m_scene->m_instances[2]->m_scale[0], 0.1f, -20.f, 20.0f);
-
+	// Spear
 	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_pos[0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Spear rotation", &m_scene->m_instances[0]->m_rot[0], 0.1f, -180.f, 180.0f);
 	ImGui::DragFloat3("Spear scale", &m_scene->m_instances[0]->m_scale[0], 0.1f, -20.f, 20.0f);
-
+	// Sword
 	ImGui::DragFloat3("Sword position", &m_scene->m_instances[1]->m_pos[0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Sword rotation", &m_scene->m_instances[1]->m_rot[0], 0.1f, -180.f, 180.0f);
 	ImGui::DragFloat3("Sword scale", &m_scene->m_instances[1]->m_scale[0], 0.1f, 0.1f, 2.0f);
-
+	// Calculate the transforms of each model to allow the position, rotation and scale to be manipulated by ImGui each frame
 	for (auto ins : m_scene->m_instances)
 		ins->RecalculateTransform();
 
@@ -341,23 +355,24 @@ void GraphicsProjectApp::IMGUI_Logic()
 
 }
 
-
+// Rotation and position for each leg part per key frame
 void GraphicsProjectApp::LegPosRot(int frameNum, KeyFrame* hipFrame, KeyFrame* kneeFrame, KeyFrame* ankleFrame,
 	glm::vec3 hipPos, glm::quat hipRot, glm::vec3 kneePos, glm::quat kneeRot, glm::vec3 anklePos, glm::quat ankleRot)
 {
+	// hip
 	hipFrame[frameNum].position = hipPos;
 	hipFrame[frameNum].rotation = hipRot;
-
+	// knee
 	kneeFrame[frameNum].position = kneePos;
 	kneeFrame[frameNum].rotation = kneeRot;
-
+	// ankle
 	ankleFrame[frameNum].position = anklePos;
 	ankleFrame[frameNum].rotation = ankleRot;
 
 }
-
-void GraphicsProjectApp::AnimateLeg(KeyFrame* hipFrames, KeyFrame* kneeFrames, KeyFrame* ankleFrames, 
-	glm::mat4 &hipBone, glm::mat4 &kneeBone, glm::mat4 &ankleBone)
+// Animate each leg part
+void GraphicsProjectApp::AnimateLeg(KeyFrame* hipFrames, KeyFrame* kneeFrames, KeyFrame* ankleFrames,
+	glm::mat4& hipBone, glm::mat4& kneeBone, glm::mat4& ankleBone)
 {
 	// animate leg
 	float sHip = glm::cos(getTime()) * 0.5f + 0.5f;
@@ -393,22 +408,23 @@ void GraphicsProjectApp::AnimateLeg(KeyFrame* hipFrames, KeyFrame* kneeFrames, K
 	ankleBone = kneeBone * glm::translate(pAnkle) * glm::toMat4(rAnkle);
 }
 
+// Draw the leg
 void GraphicsProjectApp::DrawLeg(glm::mat4 hipBone, glm::mat4 kneeBone, glm::mat4 ankleBone, glm::vec4 legColor)
 {
+	// hip
 	glm::vec3 hipPos = glm::vec3(hipBone[3].x,
 		hipBone[3].y,
 		hipBone[3].z);
-
+	// knee
 	glm::vec3 kneePos = glm::vec3(kneeBone[3].x,
 		kneeBone[3].y,
 		kneeBone[3].z);
-
+	// ankle
 	glm::vec3 anklePos = glm::vec3(ankleBone[3].x,
 		ankleBone[3].y,
 		ankleBone[3].z);
 
 	glm::vec4 half(0.5f);
-	//glm::vec4 pink(1, 0, 1, 1);
 
 	Gizmos::addAABBFilled(hipPos, half, legColor, &hipBone);
 	Gizmos::addAABBFilled(kneePos, half, legColor, &kneeBone);
