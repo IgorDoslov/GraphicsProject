@@ -306,34 +306,49 @@ void GraphicsProjectApp::IMGUI_Logic()
 	// Change light direction and colour in the scene
 	ImGui::Begin("Scene Light Settings");
 	// Sunlight
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Sunlight");
 	ImGui::DragFloat3("Sunlight Direction", &m_scene->GetLight().m_direction[0], 0.1f, -1.f, 1.f);
-	ImGui::DragFloat3("Sunlight Colour", &m_scene->GetLight().m_colour[0], 0.1f, 0.f, 2.0f);
+	ImGui::ColorEdit3("Sunlight Colour", &m_scene->GetLight().m_colour[0]);
 	ImGui::DragFloat3("Sunlight position", &sunlightMov[0], 0.1f, -50.f, 50.0f);
 	ImGui::DragFloat("Sunlight orbit", &sunLightOrbit, 0.1f, -50.f, 50.0f);
 	ImGui::DragFloat("Sunlight orbit speed", &sunLightOrbitSpeed, 0.1f, -50.f, 50.0f);
+	
 	// Ambient light
-	ImGui::DragFloat3("Ambient Colour", &m_ambLight[0], 0.1f, 0.f, 3.0f);
+	ImGui::Separator();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Ambient Light");
+	ImGui::ColorEdit3("Ambient Colour", &m_ambLight[0]);
+
 	// Point lights
+	ImGui::Separator();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Point Lights");
 	ImGui::DragFloat3("light 1 position", &m_scene->GetPointLights()[0].m_direction[0], 0.1f, -50.f, 50.0f);
-	ImGui::DragFloat3("light 1 colour", &m_scene->GetPointLights()[0].m_colour[0], 0.1f, 0.0f, 2.0f);
+	ImGui::ColorEdit3("light 1 colour", &m_scene->GetPointLights()[0].m_colour[0]);
 	ImGui::DragFloat3("light 2 position", &m_scene->GetPointLights()[1].m_direction[0], 0.1f, -50.f, 50.0f);
-	ImGui::DragFloat3("light 2 colour", &m_scene->GetPointLights()[1].m_colour[0], 0.1f, 0.0f, 2.0f);
+	ImGui::ColorEdit3("light 2 colour", &m_scene->GetPointLights()[1].m_colour[0]);
 	ImGui::End();
 
 	// These allow you to move the models around in the scene
 	ImGui::Begin("Object Positions");
 	// Bunny 
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Bunny");
 	ImGui::DragFloat3("Bunny position", &m_scene->m_instances[2]->m_pos[0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Bunny rotation", &m_scene->m_instances[2]->m_rot[0], 0.1f, -180.f, 180.0f);
 	ImGui::DragFloat3("Bunny scale", &m_scene->m_instances[2]->m_scale[0], 0.1f, -20.f, 20.0f);
+
 	// Spear
+	ImGui::Separator();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Spear");
 	ImGui::DragFloat3("Spear position", &m_scene->m_instances[0]->m_pos[0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Spear rotation", &m_scene->m_instances[0]->m_rot[0], 0.1f, -180.f, 180.0f);
 	ImGui::DragFloat3("Spear scale", &m_scene->m_instances[0]->m_scale[0], 0.1f, -20.f, 20.0f);
+
 	// Sword
+	ImGui::Separator();
+	ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Sword");
 	ImGui::DragFloat3("Sword position", &m_scene->m_instances[1]->m_pos[0], 0.1f, -20.f, 20.0f);
 	ImGui::DragFloat3("Sword rotation", &m_scene->m_instances[1]->m_rot[0], 0.1f, -180.f, 180.0f);
 	ImGui::DragFloat3("Sword scale", &m_scene->m_instances[1]->m_scale[0], 0.1f, 0.1f, 2.0f);
+
 	// Calculate the transforms of each model to allow the position, rotation and scale to be manipulated by ImGui each frame
 	for (auto ins : m_scene->m_instances)
 		ins->RecalculateTransform();
@@ -341,7 +356,6 @@ void GraphicsProjectApp::IMGUI_Logic()
 	ImGui::End();
 	// Cameras
 	ImGui::Begin("Camera Positions");
-	ImGui::Text("Camera list");
 	ImGui::TextColored(ImVec4(0, 1, 0, 1), ("Current camera: " + std::to_string(m_scene->currentCam)).c_str());
 	for (int i = 0; i < m_scene->m_cameras.size(); i++)
 	{

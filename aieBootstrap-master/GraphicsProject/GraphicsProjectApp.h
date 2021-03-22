@@ -97,9 +97,10 @@ protected:
 	glm::mat4 m_kneeBone4;
 	glm::mat4 m_ankleBone4;
 
-
+	// Ambient light
 	glm::vec3 m_ambLight = glm::vec3(0.25f);
 
+	// Sunlight
 	glm::vec3 sunlightMov = { 0.0f, 0.0f, 0.0f };
 	float sunLightOrbit = 2.0f;
 	float sunLightOrbitSpeed = 2.0f;
