@@ -262,13 +262,17 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 
 
 	// Creating the four cameras for the scene
-	m_cameras.push_back(new Camera(false, glm::vec3(1, 1, 1)));
+	/*m_cameras.push_back(new Camera(false, glm::vec3(1, 1, 1)));
 	m_cameras.push_back(new Camera(true, glm::vec3(10, 0, 0)));
 	m_cameras.push_back(new Camera(true, glm::vec3(0, 10, 0)));
-	m_cameras.push_back(new Camera(true, glm::vec3(0, 0, 10)));
+	m_cameras.push_back(new Camera(true, glm::vec3(0, 0, 10)));*/
 
 	// create the scene
-	m_scene = new Scene(m_cameras, glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
+	m_scene = new Scene(/*m_cameras,*/ glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
+	m_scene->m_cameras.push_back(new Camera(false, glm::vec3(1, 1, 1)));
+	m_scene->m_cameras.push_back(new Camera(true, glm::vec3(10, 0, 0)));
+	m_scene->m_cameras.push_back(new Camera(true, glm::vec3(0, 10, 1)));
+	m_scene->m_cameras.push_back(new Camera(true, glm::vec3(0, 0, 10)));
 
 	// Add instance of a Spear
 	m_scene->AddInstance(new Instance(glm::vec3(2, 0, 0),

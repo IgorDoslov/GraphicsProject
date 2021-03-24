@@ -36,7 +36,7 @@ public:
 protected:
 
 	Camera m_camera;
-	std::vector<Camera*> m_cameras;
+	//std::vector<Camera*> m_cameras;
 
 	// camera transforms
 	glm::mat4	m_viewMatrix;
