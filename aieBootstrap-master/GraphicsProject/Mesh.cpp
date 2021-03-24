@@ -51,10 +51,8 @@ void Mesh::InitialiseQuad()
 
 
 
-// Fill the vertex buffer
+	// Fill the vertex buffer
 	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(Vertex), vertices, GL_STATIC_DRAW);
-
-	
 
 	// Enable the first element as a position
 	glEnableVertexAttribArray(0);
@@ -67,7 +65,6 @@ void Mesh::InitialiseQuad()
 	// Enable the third element as a TexCoord
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)32);
-
 
 
 	// Unbind the buffers

@@ -160,10 +160,6 @@ void GraphicsProjectApp::update(float deltaTime) {
 	AnimateLeg(m_hipFrames4, m_kneeFrames4, m_ankleFrames4, m_hipBone4, m_kneeBone4, m_ankleBone4);
 
 
-
-
-
-
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
 }
@@ -261,14 +257,8 @@ bool GraphicsProjectApp::LoadShaderAndMeshLogic(Light a_light)
 #pragma endregion
 
 
-	// Creating the four cameras for the scene
-	/*m_cameras.push_back(new Camera(false, glm::vec3(1, 1, 1)));
-	m_cameras.push_back(new Camera(true, glm::vec3(10, 0, 0)));
-	m_cameras.push_back(new Camera(true, glm::vec3(0, 10, 0)));
-	m_cameras.push_back(new Camera(true, glm::vec3(0, 0, 10)));*/
-
 	// create the scene
-	m_scene = new Scene(/*m_cameras,*/ glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
+	m_scene = new Scene(glm::vec2(getWindowWidth(), getWindowHeight()), a_light, glm::vec3(0.25f));
 	m_scene->m_cameras.push_back(new Camera(false, glm::vec3(1, 1, 1)));
 	m_scene->m_cameras.push_back(new Camera(true, glm::vec3(10, 0, 0)));
 	m_scene->m_cameras.push_back(new Camera(true, glm::vec3(0, 10, 1)));
@@ -369,8 +359,6 @@ void GraphicsProjectApp::IMGUI_Logic()
 		}
 	}
 	ImGui::End();
-
-
 }
 
 // Rotation and position for each leg part per key frame

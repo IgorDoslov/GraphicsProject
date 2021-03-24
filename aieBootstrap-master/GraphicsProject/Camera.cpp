@@ -7,7 +7,7 @@ Camera::Camera(bool a_isStatic, glm::vec3 a_camPos)
 	m_position = a_camPos;
 	m_phi = 0;
 	m_theta = 0;
-	m_isStatic = a_isStatic;
+	m_isStatic = a_isStatic; // For if the camera can move or not
 }
 Camera::Camera(glm::vec3 a_camPos) : m_lastMouseX(), m_lastMouseY()
 {
@@ -83,7 +83,7 @@ glm::mat4 Camera::GetViewMatrix()
 	if (m_isStatic == false)
 		return glm::lookAt(m_position, m_position + forward, glm::vec3(0, 1, 0));
 	else
-		return glm::lookAt(m_position, glm::vec3(0) + forward, glm::vec3(0, 1, 0));
+		return glm::lookAt(m_position, glm::vec3(0) + forward, glm::vec3(0, 1, 0)); // Makes static camera look at the centre
 
 }
 

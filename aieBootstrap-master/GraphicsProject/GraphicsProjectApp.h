@@ -19,8 +19,6 @@ struct KeyFrame {
 };
 
 
-
-
 class GraphicsProjectApp : public aie::Application {
 public:
 
@@ -34,9 +32,6 @@ public:
 	virtual void draw();
 
 protected:
-
-	Camera m_camera;
-	//std::vector<Camera*> m_cameras;
 
 	// camera transforms
 	glm::mat4	m_viewMatrix;

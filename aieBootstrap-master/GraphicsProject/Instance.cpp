@@ -25,11 +25,12 @@ Instance::Instance(glm::vec3 a_position, glm::vec3 a_eulerAngles, glm::vec3 a_sc
 
 void Instance::Draw(Scene* a_scene)
 {
-	m_shader->bind();
 	// Bind the transform
+	m_shader->bind();
+	// Projection view matrix
 	auto pvm = a_scene->GetCurrentCam()->GetProjectionMatrix(a_scene->GetWindowSize().x,
 		a_scene->GetWindowSize().y) * a_scene->GetCurrentCam()->GetViewMatrix() * m_transform;
-
+	// bind values to shader
 	m_shader->bindUniform("ProjectionViewModel", pvm);
 	m_shader->bindUniform("CameraPosition", a_scene->GetCurrentCam()->GetPosition());
 	m_shader->bindUniform("AmbientColour", a_scene->GetAmbientLight());

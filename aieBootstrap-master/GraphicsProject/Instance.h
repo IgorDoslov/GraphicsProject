@@ -20,12 +20,13 @@ public:
 
 	static glm::mat4 MakeTransform(glm::vec3 a_position, glm::vec3 a_eulerAngles, glm::vec3 a_scale);
 
-	glm::vec3 m_pos = glm::vec3(0);
-	glm::vec3 m_rot = glm::vec3(0);
-	glm::vec3 m_scale = glm::vec3(1);
+	// Position, rotaion and scale vectors to be manipulated in IMGUI_Logic()
+	glm::vec3 m_pos = glm::vec3(0); // position
+	glm::vec3 m_rot = glm::vec3(0); // rotation
+	glm::vec3 m_scale = glm::vec3(1); // scale
 
+	// Called in IMGUI_Logic() for each instance of a model so its position, rotation and scale can be changed
 	void RecalculateTransform() { m_transform = MakeTransform(m_pos, m_rot, m_scale); }
-
 
 
 	glm::mat4 m_transform;
