@@ -5,7 +5,7 @@ class Camera
 {
 public:
 	Camera(bool a_isStatic, glm::vec3 a_camPos = glm::vec3(0)); // Takes in a bool that sets the camera to static or not
-	Camera(glm::vec3 a_camPos = glm::vec3(0)); // Camera is dynaic by default
+	Camera(glm::vec3 a_camPos = glm::vec3(0)); // Camera is dynamic by default
 
 	~Camera() {};
 
