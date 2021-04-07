@@ -2,7 +2,7 @@
 Author:		Igor Doslov
 Date:       7/4/2021
 File:		GraphicsProjectApp.h
-Purpose:	
+Purpose:	Controls all logic from bootstrap combined with our models and shaders to create our app
 */
 #pragma once
 
