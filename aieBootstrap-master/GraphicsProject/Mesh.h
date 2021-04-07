@@ -1,3 +1,10 @@
+/*
+Author:		Igor Doslov
+Date:       7/4/2021
+File:		Mesh.h
+Purpose:	
+*/
+
 #pragma once
 #include <glm/glm.hpp>
 

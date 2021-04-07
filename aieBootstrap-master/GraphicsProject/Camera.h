@@ -1,3 +1,10 @@
+/*
+Author:		Igor Doslov
+Date:       7/4/2021
+File:		Camera.h
+Purpose:	Camera class used for creating a camera in the app
+*/
+
 #pragma once
 #include <glm/glm.hpp>
 

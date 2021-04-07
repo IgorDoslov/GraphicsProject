@@ -1,3 +1,9 @@
+/*
+Author:		Igor Doslov
+Date:       7/4/2021 
+File:		Scene.h     
+Purpose:	To set up a scene
+*/
 #pragma once
 #include <list>
 #include <vector>

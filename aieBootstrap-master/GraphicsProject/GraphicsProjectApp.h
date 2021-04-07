@@ -1,3 +1,9 @@
+/*
+Author:		Igor Doslov
+Date:       7/4/2021
+File:		GraphicsProjectApp.h
+Purpose:	
+*/
 #pragma once
 
 #include "Application.h"
