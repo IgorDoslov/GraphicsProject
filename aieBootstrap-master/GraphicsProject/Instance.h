@@ -1,8 +1,9 @@
 /*
-Author:		Igor Doslov
-Date:       7/4/2021
-File:		Instance.h
-Purpose:	To create an instance of a model
+Author:				Igor Doslov
+Date created:       10/3/2021
+Date modified:      7/4/2021
+File:				Instance.h
+Purpose:			To create an instance of a model
 */
 #pragma once
 #include <glm/glm.hpp>

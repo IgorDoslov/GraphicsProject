@@ -1,8 +1,9 @@
 /*
-Author:		Igor Doslov
-Date:       7/4/2021
-File:		GraphicsProjectApp.h
-Purpose:	Controls all logic from bootstrap combined with our models and shaders to create our app
+Author:				Igor Doslov
+Date created:       10/3/2021
+Date modified:      7/4/2021
+File:				GraphicsProjectApp.h
+Purpose:			Controls all logic from bootstrap combined with our models and shaders to create our app
 */
 #pragma once
 

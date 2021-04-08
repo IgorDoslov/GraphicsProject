@@ -1,8 +1,9 @@
 /*
-Author:		Igor Doslov
-Date:       7/4/2021
-File:		Mesh.h
-Purpose:	
+Author:				Igor Doslov
+Date created:       10/3/2021
+Date modified:      7/4/2021
+File:				Mesh.h
+Purpose:			Takes in vertex information to construct the mesh
 */
 
 #pragma once

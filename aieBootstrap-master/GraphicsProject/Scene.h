@@ -1,8 +1,9 @@
 /*
-Author:		Igor Doslov
-Date:       7/4/2021 
-File:		Scene.h     
-Purpose:	To set up a scene
+Author:				Igor Doslov
+Date created:       10/3/2021 
+Date modified:      7/4/2021
+File:				Scene.h     
+Purpose:			To set up a scene
 */
 #pragma once
 #include <list>
